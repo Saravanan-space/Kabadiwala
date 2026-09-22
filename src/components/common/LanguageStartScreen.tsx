@@ -11,7 +11,7 @@ export function LanguageStartScreen() {
 
   const handlePreviewAudio = (e: React.MouseEvent, langCode: Language, textToSpeak: string) => {
     e.stopPropagation();
-    speakText(textToSpeak, `lang-${langCode}`);
+    speakText(textToSpeak, `lang-${langCode}`, langCode);
   };
 
   const handleConfirm = () => {

@@ -10,7 +10,7 @@ interface LanguageContextType {
   selectLanguage: (lang: Language) => void;
   openLanguageSelector: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
-  speakText: (text: string, elementId?: string) => void;
+  speakText: (text: string, elementId?: string, overrideLang?: Language) => void;
   stopSpeech: () => void;
   isSpeaking: boolean;
   speakingId: string | null;
@@ -33,6 +33,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(savedLang);
     }
     setIsLanguageSelected(isSelected);
+
+    // Warm up TTS voices loading in background
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -44,11 +52,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguage(lang);
     setIsLanguageSelected(true);
     localStorage.setItem('kabadiwala_lang_selected', 'true');
-    
-    // Announce selected language via TTS
-    const langObj = SUPPORTED_LANGUAGES.find(l => l.code === lang);
-    const greetingText = translations[lang]?.select_language_title || "Language selected";
-    speakText(`${langObj?.nativeName || ''}. ${greetingText}`);
   };
 
   const openLanguageSelector = () => {
@@ -63,7 +66,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setSpeakingId(null);
   };
 
-  const speakText = (text: string, elementId?: string) => {
+  const speakText = (text: string, elementId?: string, overrideLang?: Language) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     // Stop ongoing speech
@@ -71,11 +74,54 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     if (!text || text.trim() === '') return;
 
+    const targetLang = overrideLang || language;
+    const langObj = SUPPORTED_LANGUAGES.find(l => l.code === targetLang);
+    const targetBcp = langObj?.bcp47 || 'hi-IN';
+
     const utterance = new SpeechSynthesisUtterance(text);
-    const langObj = SUPPORTED_LANGUAGES.find(l => l.code === language);
-    utterance.lang = langObj?.bcp47 || 'hi-IN';
+    utterance.lang = targetBcp;
     utterance.rate = 0.9; // slightly slower for better clarity for elderly/illiterate users
     utterance.pitch = 1.0;
+
+    // Dynamically match system voices for target language (e.g. Kannada, Marathi, Hindi)
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      const primaryLang = targetLang.toLowerCase();
+      const targetBcpClean = targetBcp.toLowerCase().replace('_', '-');
+
+      // 1. Exact BCP-47 match e.g. 'kn-in', 'mr-in', 'hi-in'
+      let selectedVoice = voices.find(
+        v => v.lang.toLowerCase().replace('_', '-') === targetBcpClean
+      );
+
+      // 2. Prefix match e.g. 'kn', 'mr', 'hi'
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.lang.toLowerCase().startsWith(primaryLang));
+      }
+
+      // 3. Match by name (e.g. "Kannada", "ಕನ್ನಡ", "Marathi", "मराठी", "Hindi", "हिंदी")
+      if (!selectedVoice) {
+        const nameKeywords: Record<string, string[]> = {
+          kn: ['kannada', 'ಕನ್ನಡ', 'kn'],
+          mr: ['marathi', 'मराठी', 'mr'],
+          hi: ['hindi', 'हिंदी', 'hi'],
+          ta: ['tamil', 'தமிழ்', 'ta'],
+          te: ['telugu', 'తెలుగు', 'te'],
+          gu: ['gujarati', 'ગુજરાતી', 'gu'],
+          bn: ['bengali', 'বাংলা', 'bn'],
+          en: ['english', 'en'],
+        };
+        const keywords = nameKeywords[primaryLang] || [];
+        selectedVoice = voices.find(v => {
+          const vName = v.name.toLowerCase();
+          return keywords.some(kw => vName.includes(kw));
+        });
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+    }
 
     utterance.onstart = () => {
       setIsSpeaking(true);

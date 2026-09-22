@@ -31,14 +31,12 @@ export function VerifyHandoverScreen({
   verifiedWeight = 7.8,
   finalPricePerKg = 210,
 }: VerifyHandoverScreenProps) {
-  const { t, speakText } = useLanguage();
+  const { t } = useLanguage();
   const [paymentMethod, setPaymentMethod] = useState<'digital' | 'cash'>('digital');
 
   const totalAmount = Math.round(verifiedWeight * finalPricePerKg); // 7.8 * 210 = 1638
 
   const handleConfirm = () => {
-    speakText(`Handover confirmed! Total amount ₹${totalAmount} paid via ${paymentMethod === 'digital' ? 'UPI' : 'Cash'}.`);
-    
     confetti({
       particleCount: 120,
       spread: 80,

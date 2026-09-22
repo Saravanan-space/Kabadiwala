@@ -26,16 +26,13 @@ export function UserMainInterface({
   activeLotsCount = 0,
   completedLotsCount = 0,
 }: UserMainInterfaceProps) {
-  const { t, openLanguageSelector, speakText } = useLanguage();
-
-  const mainSpeechText = `${t('app_title')}. ${t('greeting')}. ${t('sell_material_title')}: ${t('sell_material_desc')}. ${t('todays_rates')}, ${t('my_lots')}, ${t('my_earnings')}.`;
+  const { t, openLanguageSelector } = useLanguage();
 
   return (
     <div className="flex flex-col gap-5 px-4 py-4 sm:px-6 max-w-md mx-auto w-full pb-24 font-sans">
       {/* 1. Large Main Hero Banner: Sell Material */}
       <button
         onClick={() => {
-          speakText(`${t('sell_material_title')}. ${t('sell_material_desc')}`);
           onNavigate('sell');
         }}
         className="w-full text-left bg-emerald-800 hover:bg-emerald-900 active:scale-[0.99] transition-all rounded-3xl p-6 text-white shadow-xl shadow-emerald-800/25 flex items-center justify-between group relative overflow-hidden"
@@ -64,7 +61,6 @@ export function UserMainInterface({
         {/* Today's Rates */}
         <button
           onClick={() => {
-            speakText(t('todays_rates'));
             onNavigate('todays_rates');
           }}
           className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-emerald-500/50 active:scale-[0.98] transition-all flex items-center justify-between group text-left"
@@ -85,7 +81,6 @@ export function UserMainInterface({
         {/* My Lots */}
         <button
           onClick={() => {
-            speakText(t('my_lots'));
             onNavigate('my_lots');
           }}
           className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-emerald-500/50 active:scale-[0.98] transition-all flex items-center justify-between group text-left"
@@ -107,7 +102,6 @@ export function UserMainInterface({
       {/* 3. Full Width Card: My Earnings */}
       <button
         onClick={() => {
-          speakText(t('my_earnings'));
           onNavigate('my_earnings');
         }}
         className="w-full bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-purple-500/50 active:scale-[0.99] transition-all flex items-center justify-between group text-left"
@@ -159,7 +153,6 @@ export function UserMainInterface({
         {/* Find Recycler */}
         <button
           onClick={() => {
-            speakText(t('find_recycler'));
             onNavigate('find_recycler');
           }}
           className="flex flex-col items-center gap-2 group active:scale-95 transition-all"
@@ -175,7 +168,6 @@ export function UserMainInterface({
         {/* Help */}
         <button
           onClick={() => {
-            speakText(t('help'));
             onNavigate('help');
           }}
           className="flex flex-col items-center gap-2 group active:scale-95 transition-all"
@@ -191,7 +183,6 @@ export function UserMainInterface({
         {/* Language */}
         <button
           onClick={() => {
-            speakText(t('language'));
             openLanguageSelector();
           }}
           className="flex flex-col items-center gap-2 group active:scale-95 transition-all"

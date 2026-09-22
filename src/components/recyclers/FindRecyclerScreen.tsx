@@ -66,7 +66,7 @@ export function FindRecyclerScreen({
   materialName = 'Cable',
   weightKg = 0.5,
 }: FindRecyclerScreenProps) {
-  const { t, speakText } = useLanguage();
+  const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState<'best' | 'highest' | 'closest'>('best');
 
   const getFilteredRecyclers = () => {
@@ -232,7 +232,6 @@ export function FindRecyclerScreen({
                 {/* Primary Button */}
                 <button
                   onClick={() => {
-                    speakText(`Selected ${rec.name}. Rate ₹${rec.rate} per kg.`);
                     onSelectRecycler(rec);
                   }}
                   className="w-full py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 active:scale-[0.99] text-white font-bold text-base shadow-md shadow-emerald-800/20 transition-all"

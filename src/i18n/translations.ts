@@ -139,7 +139,49 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Audio prompts
     read_aloud: "Read Aloud",
-    playing_audio: "Speaking..."
+    playing_audio: "Speaking...",
+
+    // Rate Item Names
+    rate_pcb: "PCB Circuit Board",
+    rate_cable: "Copper Cable",
+    rate_battery: "Lithium Battery",
+    rate_crt: "CRT Monitor",
+    rate_lcd: "LCD Panel",
+    rate_motor: "Copper Motor",
+    rate_magnet: "Magnet Assembly",
+
+    // Recycler Dashboard
+    recycler_dashboard_title: "Recycler Partner Portal",
+    recycler_mode: "Recycler Mode",
+    switch_to_seller: "Switch to Seller",
+    switch_to_recycler: "Recycler Portal 🔄",
+    tab_incoming_lots: "Incoming Lots",
+    tab_rate_card: "My Rates",
+    tab_history: "History & Track",
+    tab_profile: "My Profile",
+    accept_lot: "Accept Request",
+    update_rate_btn: "Update Rate",
+    save_profile_btn: "Save Profile",
+    service_radius: "Service Radius",
+    home_pickup_toggle: "Home Pickup Available",
+    accepted_materials: "Accepted Materials",
+    total_purchased: "Total Purchased",
+    total_spent: "Total Paid Out",
+
+    // Role Selection & Collector Dashboard
+    select_role_title: "Select Your Interface",
+    select_role_sub: "Choose how you want to use Kabadiwala Connect",
+    role_user_title: "Scrap Collector / Aggregator",
+    role_user_desc: "Photograph & classify e-waste, check market rates, track lots & earnings.",
+    role_recycler_title: "Authorized Recycler",
+    role_recycler_desc: "Manage incoming scrap lots, update buying rates & track factory volume.",
+    role_collector_title: "Scrap Collector / Aggregator",
+    role_collector_desc: "View neighborhood pickup requests, optimize collection routes & batch scrap.",
+    collector_portal_title: "Scrap Collector Portal",
+    tab_pickups: "Pickup Route",
+    tab_batching: "Scrap Batching",
+    logout_btn: "Log Out",
+    switch_role: "Switch Role"
   },
   hi: {
     app_title: "कबाड़ीवाला",
@@ -250,7 +292,49 @@ export const translations: Record<Language, Record<string, string>> = {
     payout_history: "भुगतान इतिहास",
 
     read_aloud: "सुनें (बोलकर बताएं)",
-    playing_audio: "बोल रहा है..."
+    playing_audio: "बोल रहा है...",
+
+    // Rate Item Names
+    rate_pcb: "सर्किट बोर्ड (PCB)",
+    rate_cable: "तांबा केबल",
+    rate_battery: "लिथियम बैटरी",
+    rate_crt: "सीआरटी मॉनिटर",
+    rate_lcd: "एलसीडी पैनल",
+    rate_motor: "कॉपर मोटर",
+    rate_magnet: "चुंबक असेंबली",
+
+    // Recycler Dashboard
+    recycler_dashboard_title: "रीसाइकलर पार्टनर पोर्टल",
+    recycler_mode: "रीसाइकलर मोड",
+    switch_to_seller: "विक्रेता मोड में बदलें",
+    switch_to_recycler: "रीसाइकलर पोर्टल 🔄",
+    tab_incoming_lots: "आने वाली लॉट",
+    tab_rate_card: "मेरे भाव",
+    tab_history: "इतिहास व ट्रैकिंग",
+    tab_profile: "मेरी प्रोफ़ाइल",
+    accept_lot: "स्वीकार करें",
+    update_rate_btn: "भाव बदलें",
+    save_profile_btn: "प्रोफ़ाइल सहेजें",
+    service_radius: "सेवा दायरा",
+    home_pickup_toggle: "घर से पिकअप उपलब्ध",
+    accepted_materials: "स्वीकृत सामग्री",
+    total_purchased: "कुल खरीदारी",
+    total_spent: "कुल भुगतान",
+
+    // Role Selection & Collector Dashboard
+    select_role_title: "अपनी भूमिका चुनें",
+    select_role_sub: "कबाड़ीवाला कनेक्ट का उपयोग कैसे करना चाहते हैं चुनें",
+    role_user_title: "कबाड़ीवाला / स्क्रैप कलेक्टर",
+    role_user_desc: "ई-कचरा फोटो खींचें, आज के भाव देखें, लॉट और अपनी कमाई संभालें।",
+    role_recycler_title: "प्रमाणित रीसाइकलर",
+    role_recycler_desc: "आने वाली लॉट देखें, अपने भाव बदलें और रीसाइकिलिंग का हिसाब रखें।",
+    role_collector_title: "कबाड़ीवाला पिकअप एजेंट",
+    role_collector_desc: "आस-पास की पिकअप देखें, रूट तय करें और कचरा इकट्ठा करके रीसाइकलर को बेचें।",
+    collector_portal_title: "कबाड़ीवाला कलेक्टर पोर्टल",
+    tab_pickups: "पिकअप रूट",
+    tab_batching: "स्क्रैप बैचिंग",
+    logout_btn: "लॉग आउट",
+    switch_role: "भूमिका बदलें"
   },
   mr: {
     app_title: "कबाडीवाला",
@@ -361,7 +445,49 @@ export const translations: Record<Language, Record<string, string>> = {
     payout_history: "कमाईचा इतिहास",
 
     read_aloud: "ऐका (ऑडिओ)",
-    playing_audio: "बोलत आहे..."
+    playing_audio: "बोलत आहे...",
+
+    // Rate Item Names
+    rate_pcb: "सर्किट बोर्ड (PCB)",
+    rate_cable: "तांब्याची केबल",
+    rate_battery: "लिथियम बॅटरी",
+    rate_crt: "सीआरटी मॉनिटर",
+    rate_lcd: "एलसीडी पॅनेल",
+    rate_motor: "कॉपर मोटर",
+    rate_magnet: "चुंबक संच",
+
+    // Recycler Dashboard
+    recycler_dashboard_title: "रिसायकलर पार्टनर पोर्टल",
+    recycler_mode: "रिसायकलर मोड",
+    switch_to_seller: "विक्रेता मोडवर जा",
+    switch_to_recycler: "रिसायकलर पोर्टल 🔄",
+    tab_incoming_lots: "येणारे लॉट्स",
+    tab_rate_card: "माझे दर",
+    tab_history: "इतिहास आणि ट्रॅकिंग",
+    tab_profile: "माझी प्रोफाईल",
+    accept_lot: "स्वीकार करा",
+    update_rate_btn: "दर बदला",
+    save_profile_btn: "प्रोफाईल जतन करा",
+    service_radius: "सेवा त्रिज्या",
+    home_pickup_toggle: "घरातून पिकअप उपलब्ध",
+    accepted_materials: "स्वीकारलेली सामग्री",
+    total_purchased: "एकूण खरेदी",
+    total_spent: "एकूण भरलेली रक्कम",
+
+    // Role Selection & Collector Dashboard
+    select_role_title: "तुमची भूमिका निवडा",
+    select_role_sub: "कबाडीवाला कनेक्ट वापरण्याची पद्धत निवडा",
+    role_user_title: "कबाडीवाला / स्क्रॅप कलेक्टर",
+    role_user_desc: "ई-कचऱ्याचा फोटो काढा, आजचे दर पाहा, लॉट्स आणि कमाई सांभाळा.",
+    role_recycler_title: "अधिकृत रिसायकलर",
+    role_recycler_desc: "येणारे लॉट्स पाहा, आपले दर बदला आणि रिसायकलिंगचा हिशोब ठेवा.",
+    role_collector_title: "कबाडीवाला पिकअप एजंट",
+    role_collector_desc: "जवळचे पिकअप पाहा, मार्ग ठरवा आणि कचरा गोळा करून रिसायकलरला विका.",
+    collector_portal_title: "कबाडीवाला कलेक्टर पोर्टल",
+    tab_pickups: "पिकअप मार्ग",
+    tab_batching: "स्क्रॅप बॅचिंग",
+    logout_btn: "लॉग आउट",
+    switch_role: "भूमिका बदला"
   },
   ta: {
     app_title: "கபாடிவாலா",
@@ -694,7 +820,49 @@ export const translations: Record<Language, Record<string, string>> = {
     payout_history: "ಇತಿಹಾಸ",
 
     read_aloud: "ಆಡಿಯೋ ಕೇಳಿ",
-    playing_audio: "ಮಾತನಾಡುತ್ತಿದೆ..."
+    playing_audio: "ಮಾತನಾಡುತ್ತಿದೆ...",
+
+    // Rate Item Names
+    rate_pcb: "ಸರ್ಕ್ಯೂಟ್ ಬೋರ್ಡ್ (PCB)",
+    rate_cable: "ತಾಮ್ರದ ಕೇಬಲ್",
+    rate_battery: "ಲಿಥಿಯಂ ಬ್ಯಾಟರಿ",
+    rate_crt: "ಸಿಆರ್‌ಟಿ ಮಾನಿಟರ್",
+    rate_lcd: "ಎಲ್‌ಸಿಡಿ ಪ್ಯಾನಲ್",
+    rate_motor: "ಕಾಪರ್ ಮೋಟಾರ್",
+    rate_magnet: "ಮ್ಯಾಗ್ನೆಟ್ ಅಸೆಂಬ್ಲಿ",
+
+    // Recycler Dashboard
+    recycler_dashboard_title: "ರೀಸೈಕ್ಲರ್ ಪಾಲುದಾರ ಪೋರ್ಟಲ್",
+    recycler_mode: "ರೀಸೈಕ್ಲರ್ ಮೋಡ್",
+    switch_to_seller: "ಮಾರಾಟಗಾರರ ಮೋಡ್‌ಗೆ ಬದಲಾಯಿಸಿ",
+    switch_to_recycler: "ರೀಸೈಕ್ಲರ್ ಪೋರ್ಟಲ್ 🔄",
+    tab_incoming_lots: "ಬರುವ ಲಾಟ್‌ಗಳು",
+    tab_rate_card: "ನನ್ನ ದರಗಳು",
+    tab_history: "ಇತಿಹಾಸ ಮತ್ತು ಟ್ರ್ಯಾಕಿಂಗ್",
+    tab_profile: "ನನ್ನ ಪ್ರೊಫೈಲ್",
+    accept_lot: "ಸ್ವೀಕರಿಸಿ",
+    update_rate_btn: "ದರ ನವೀಕರಿಸಿ",
+    save_profile_btn: "ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ",
+    service_radius: "ಸೇವಾ ತ್ರಿಜ್ಯ",
+    home_pickup_toggle: "ಮನೆ ಪಿಕಪ್ ಲಭ್ಯವಿದೆ",
+    accepted_materials: "ಸ್ವೀಕರಿಸಿದ ವಸ್ತುಗಳು",
+    total_purchased: "ಒಟ್ಟು ಖರೀದಿ",
+    total_spent: "ಒಟ್ಟು ಪಾವತಿಸಿದ ಹಣ",
+
+    // Role Selection & Collector Dashboard
+    select_role_title: "ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    select_role_sub: "ನೀವು ಕಬಾಡಿವಾಲಾ ಕನೆಕ್ಟ್ ಅನ್ನು ಹೇಗೆ ಬಳಸಲು ಬಯಸುತ್ತೀರಿ ಆಯ್ಕೆಮಾಡಿ",
+    role_user_title: "ಕಸ ಸಂಗ್ರಾಹಕ / ಕಬಾಡಿವಾಲಾ",
+    role_user_desc: "ಇ-ತ್ಯಾಜ್ಯದ ಫೋಟೋ ತೆಗೆಯಿರಿ, ಇಂದಿನ ಮಾರುಕಟ್ಟೆ ದರ ನೋಡಿ, ನಿಮ್ಮ ಗಳಿಕೆ ನಿರ್ವಹಿಸಿ.",
+    role_recycler_title: "ಅಧಿಕೃತ ರಿಸೈಕ್ಲರ್",
+    role_recycler_desc: "ಬರುವ ತ್ಯಾಜ್ಯ ಲಾಟ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ, ದರಗಳನ್ನು ನವೀಕರಿಸಿ.",
+    role_collector_title: "ಕಸ ಸಂಗ್ರಾಹಕ / ಕಬಾಡಿವಾಲಾ",
+    role_collector_desc: "ಸಮೀಪದ ಪಿಕಪ್ ವಿನಂತಿಗಳನ್ನು ನೋಡಿ, ಮಾರ್ಗ ಯೋಜಿಸಿ ಮತ್ತು ತ್ಯಾಜ್ಯ ಸಂಗ್ರಹಿಸಿ.",
+    collector_portal_title: "ಕಬಾಡಿವಾಲಾ ಕಲೆಕ್ಟರ್ ಪೋರ್ಟಲ್",
+    tab_pickups: "ಪಿಕಪ್ ಮಾರ್ಗ",
+    tab_batching: "ತ್ಯಾಜ್ಯ ಬ್ಯಾಚಿಂಗ್",
+    logout_btn: "ಲಾಗ್ ಔಟ್",
+    switch_role: "ಪಾತ್ರ ಬದಲಾಯಿಸಿ"
   },
   gu: {
     app_title: "કબાડીવાલા",

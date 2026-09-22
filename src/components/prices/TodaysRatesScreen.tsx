@@ -17,7 +17,8 @@ interface TodaysRatesScreenProps {
 const RATES_DATA = [
   {
     id: 'pcb',
-    title: 'PCB',
+    titleKey: 'rate_pcb',
+    fallbackTitle: 'PCB',
     price: '₹340–370',
     unit: '/kg',
     trend: 'rising',
@@ -25,7 +26,8 @@ const RATES_DATA = [
   },
   {
     id: 'cable',
-    title: 'Cable',
+    titleKey: 'rate_cable',
+    fallbackTitle: 'Cable',
     price: '₹180–220',
     unit: '/kg',
     trend: 'stable',
@@ -33,7 +35,8 @@ const RATES_DATA = [
   },
   {
     id: 'battery',
-    title: 'Battery',
+    titleKey: 'rate_battery',
+    fallbackTitle: 'Battery',
     price: '₹60–90',
     unit: '/kg',
     trend: 'falling',
@@ -41,7 +44,8 @@ const RATES_DATA = [
   },
   {
     id: 'crt',
-    title: 'CRT Monitor',
+    titleKey: 'rate_crt',
+    fallbackTitle: 'CRT Monitor',
     price: '₹15–25',
     unit: '/kg',
     trend: 'stable',
@@ -49,7 +53,8 @@ const RATES_DATA = [
   },
   {
     id: 'lcd',
-    title: 'LCD Panel',
+    titleKey: 'rate_lcd',
+    fallbackTitle: 'LCD Panel',
     price: '₹45–70',
     unit: '/kg',
     trend: 'rising',
@@ -57,7 +62,8 @@ const RATES_DATA = [
   },
   {
     id: 'motor',
-    title: 'Motor',
+    titleKey: 'rate_motor',
+    fallbackTitle: 'Motor',
     price: '₹120–160',
     unit: '/kg',
     trend: 'stable',
@@ -65,7 +71,8 @@ const RATES_DATA = [
   },
   {
     id: 'magnet',
-    title: 'Magnet Assembly',
+    titleKey: 'rate_magnet',
+    fallbackTitle: 'Magnet Assembly',
     price: '₹200–240',
     unit: '/kg',
     trend: 'rising',
@@ -76,6 +83,13 @@ const RATES_DATA = [
 export function TodaysRatesScreen({ onBack }: TodaysRatesScreenProps) {
   const { t, speakText, isSpeaking, speakingId } = useLanguage();
 
+  const getLocalizedTitle = (item: typeof RATES_DATA[0]) => {
+    const localized = t(item.titleKey);
+    return localized !== item.titleKey ? localized : item.fallbackTitle;
+  };
+
+  const overviewAudio = `${t('todays_rates_title')}. ${getLocalizedTitle(RATES_DATA[0])} ${RATES_DATA[0].price}. ${getLocalizedTitle(RATES_DATA[1])} ${RATES_DATA[1].price}. ${getLocalizedTitle(RATES_DATA[2])} ${RATES_DATA[2].price}.`;
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       <Header
@@ -83,11 +97,12 @@ export function TodaysRatesScreen({ onBack }: TodaysRatesScreenProps) {
         subtitle=""
         showBack
         onBack={onBack}
-        pageAudioText={`${t('todays_rates_title')}. PCB ${RATES_DATA[0].price}. Cable ${RATES_DATA[1].price}. Battery ${RATES_DATA[2].price}.`}
+        pageAudioText={overviewAudio}
       />
 
       <div className="max-w-md mx-auto px-4 py-4 space-y-3">
         {RATES_DATA.map((item) => {
+          const itemTitle = getLocalizedTitle(item);
           const isPlayingThisItem = isSpeaking && speakingId === `rate-${item.id}`;
 
           return (
@@ -99,12 +114,12 @@ export function TodaysRatesScreen({ onBack }: TodaysRatesScreenProps) {
               <div className="flex items-center gap-3.5">
                 <img
                   src={item.image}
-                  alt={item.title}
+                  alt={itemTitle}
                   className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shrink-0"
                 />
                 <div>
                   <h3 className="text-lg font-black text-slate-900 leading-snug">
-                    {item.title}
+                    {itemTitle}
                   </h3>
 
                   {/* Trend Badge */}
@@ -144,7 +159,7 @@ export function TodaysRatesScreen({ onBack }: TodaysRatesScreenProps) {
 
                 <button
                   onClick={() =>
-                    speakText(`${item.title}, ${item.price} per kg.`, `rate-${item.id}`)
+                    speakText(`${itemTitle}, ${item.price} ${t('per_kg')}.`, `rate-${item.id}`)
                   }
                   className={`p-3 rounded-full border transition-all ${
                     isPlayingThisItem

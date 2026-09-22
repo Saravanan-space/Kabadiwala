@@ -12,6 +12,8 @@ import { VerifyHandoverScreen } from '../components/lots/VerifyHandoverScreen';
 import { TodaysRatesScreen } from '../components/prices/TodaysRatesScreen';
 import { HelpSectionScreen } from '../components/help/HelpSectionScreen';
 import { MyEarningsScreen } from '../components/earnings/MyEarningsScreen';
+import { RoleSelectionScreen, UserRole } from '../components/common/RoleSelectionScreen';
+import { RecyclerDashboard } from '../components/recyclers/RecyclerDashboard';
 import { Package, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 type ScreenState =
@@ -23,10 +25,12 @@ type ScreenState =
   | 'todays_rates'
   | 'my_lots'
   | 'help'
-  | 'my_earnings';
+  | 'my_earnings'
+  | 'recycler_dashboard';
 
 function AppContent() {
-  const { isLanguageSelected, t, speakText } = useLanguage();
+  const { isLanguageSelected, t } = useLanguage();
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('home');
   const [userLots, setUserLots] = useState<any[]>([
     {
@@ -34,6 +38,8 @@ function AppContent() {
       material: 'Cable',
       weight: 0.5,
       priceRange: '₹90–₹110',
+      offerPrice: 210,
+      pickupType: 'home',
       recycler: {
         name: 'GreenCycle Recycling',
         address: 'MIDC Andheri East, Mumbai',
@@ -42,12 +48,57 @@ function AppContent() {
       status: 'Handover Pending',
       timestamp: new Date().toISOString(),
     },
+    {
+      id: 'KBD-1041',
+      material: 'PCB (Circuit Board)',
+      weight: 12.0,
+      priceRange: '₹340–370/kg',
+      offerPrice: 355,
+      pickupType: 'self',
+      status: 'Completed',
+      timestamp: new Date(Date.now() - 86400000).toISOString(),
+    },
   ]);
   const [activeLotId, setActiveLotId] = useState<string>('KBD-1042');
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRole = localStorage.getItem('kabadiwala_user_role') as UserRole;
+      if (savedRole) {
+        setUserRole(savedRole);
+      }
+    }
+  }, []);
+
+  const handleSelectRole = (role: UserRole) => {
+    setUserRole(role);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kabadiwala_user_role', role);
+    }
+    if (role === 'recycler') {
+      setCurrentScreen('recycler_dashboard');
+    } else {
+      setCurrentScreen('home');
+    }
+  };
+
+  const handleLogout = () => {
+    setUserRole(null);
+    setCurrentScreen('home');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('kabadiwala_user_role');
+    }
+  };
 
   const handleLotCreated = (newLot: any) => {
     setUserLots((prev) => [newLot, ...prev]);
     setActiveLotId(newLot.id);
+  };
+
+  const handleUpdateLotStatus = (lotId: string, newStatus: string, extraData?: any) => {
+    setUserLots((prev) =>
+      prev.map((l) => (l.id === lotId ? { ...l, status: newStatus, ...extraData } : l))
+    );
   };
 
   const selectedLot = userLots.find((l) => l.id === activeLotId) || userLots[0];
@@ -60,28 +111,46 @@ function AppContent() {
       {/* 1. Language Start Screen Modal overlay */}
       {!isLanguageSelected && <LanguageStartScreen />}
 
-      {/* 2. Page Router */}
-      {currentScreen === 'home' && (
-        <>
-          <Header />
-          <UserMainInterface
-            onNavigate={(scr) => setCurrentScreen(scr as ScreenState)}
-            activeLotsCount={activeCount}
-            completedLotsCount={completedCount}
-          />
-        </>
+      {/* 2. Role Selection Landing Screen if no role selected */}
+      {isLanguageSelected && !userRole && (
+        <RoleSelectionScreen onSelectRole={handleSelectRole} />
       )}
 
-      {currentScreen === 'sell' && (
-        <SellMaterialFlow
-          onBackToHome={() => setCurrentScreen('home')}
-          onLotCreated={handleLotCreated}
-          onFindRecyclersForLot={(lotId) => {
-            setActiveLotId(lotId);
-            setCurrentScreen('find_recycler');
-          }}
+      {/* 3. Role-Based Routers */}
+      {isLanguageSelected && userRole === 'recycler' && currentScreen === 'recycler_dashboard' && (
+        <RecyclerDashboard
+          onSwitchToSellerMode={handleLogout}
+          lots={userLots}
+          onUpdateLotStatus={handleUpdateLotStatus}
         />
       )}
+
+      {isLanguageSelected && (userRole === 'user' || (userRole === 'recycler' && currentScreen !== 'recycler_dashboard')) && (
+        <>
+          {currentScreen === 'home' && (
+            <>
+              <Header
+                onSwitchRecyclerMode={() => handleSelectRole('recycler')}
+                onLogout={handleLogout}
+              />
+              <UserMainInterface
+                onNavigate={(scr) => setCurrentScreen(scr as ScreenState)}
+                activeLotsCount={activeCount}
+                completedLotsCount={completedCount}
+              />
+            </>
+          )}
+
+          {currentScreen === 'sell' && (
+            <SellMaterialFlow
+              onBackToHome={() => setCurrentScreen('home')}
+              onLotCreated={handleLotCreated}
+              onFindRecyclersForLot={(lotId) => {
+                setActiveLotId(lotId);
+                setCurrentScreen('find_recycler');
+              }}
+            />
+          )}
 
       {currentScreen === 'find_recycler' && (
         <FindRecyclerScreen
@@ -159,7 +228,6 @@ function AppContent() {
                 key={lot.id}
                 onClick={() => {
                   setActiveLotId(lot.id);
-                  speakText(`Lot ID ${lot.id}. ${lot.material} ${lot.weight} kg.`);
                   setCurrentScreen('lot_details');
                 }}
                 className="w-full text-left bg-white rounded-3xl p-4 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex items-center justify-between group"
@@ -188,6 +256,8 @@ function AppContent() {
             ))}
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

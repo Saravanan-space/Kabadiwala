@@ -1,0 +1,30 @@
+services:
+  # -------------------------------------------------------------
+  # 1. FastAPI Python Backend (YOLO Waste Detector AI)
+  # -------------------------------------------------------------
+  - type: web
+    name: kabadiwala-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: "*"
+
+  # -------------------------------------------------------------
+  # 2. Next.js Frontend App
+  # -------------------------------------------------------------
+  - type: web
+    name: kabadiwala-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_AI_MODE
+        value: api
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: kabadiwala-backend
+          property: url

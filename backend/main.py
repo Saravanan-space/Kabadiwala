@@ -7,13 +7,16 @@ import uuid
 from services.detector import detect_waste
 
 
+import os
+
 app = FastAPI(title="KABADIWALA AI Backend")
 
-
 # Allow your Next.js frontend to communicate with this backend
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins if allowed_origins != ["*"] else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -36,7 +36,7 @@ export function LotDetailsScreen({
     statusStep: 4, // Handover pending
   },
 }: LotDetailsScreenProps) {
-  const { t, speakText } = useLanguage();
+  const { t } = useLanguage();
 
   const timelineSteps = [
     { key: 'status_created', icon: PlusCircle, done: true, time: t('just_now') },
@@ -148,7 +148,6 @@ export function LotDetailsScreen({
         {/* Primary Action Button */}
         <button
           onClick={() => {
-            speakText(t('verify_handover_btn'));
             onVerifyHandover();
           }}
           className="w-full py-4 rounded-2xl bg-emerald-800 hover:bg-emerald-900 active:scale-[0.99] text-white font-bold text-lg shadow-lg shadow-emerald-800/25 flex items-center justify-center gap-2 transition-all"

@@ -55,7 +55,6 @@ export function HelpSectionScreen({ onBack }: HelpSectionScreenProps) {
     if (activeStep < helpSteps.length - 1) {
       const nextIdx = activeStep + 1;
       setActiveStep(nextIdx);
-      speakText(`${helpSteps[nextIdx].title}. ${helpSteps[nextIdx].desc}`);
     } else {
       onBack();
     }

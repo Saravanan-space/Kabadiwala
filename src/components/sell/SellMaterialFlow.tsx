@@ -41,7 +41,7 @@ export function SellMaterialFlow({
   onLotCreated,
   onFindRecyclersForLot,
 }: SellMaterialFlowProps) {
-  const { t, speakText } = useLanguage();
+  const { t } = useLanguage();
   const [step, setStep] = useState<number>(1);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState(MATERIAL_PRESETS[0]);
@@ -104,8 +104,6 @@ export function SellMaterialFlow({
       console.warn('AI analysis error, using fallback:', err);
     } finally {
       setIsScanning(false);
-      const currentMat = selectedMaterial;
-      speakText(`${t('ai_detected_title')}: ${currentMat.name}. ${currentMat.priceRange}`);
     }
   };
 
@@ -287,7 +285,6 @@ export function SellMaterialFlow({
                     key={m.id}
                     onClick={() => {
                       setSelectedMaterial(m);
-                      speakText(`${m.name}. ${m.priceRange}`);
                     }}
                     className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
                       isSel
@@ -367,7 +364,6 @@ export function SellMaterialFlow({
                     key={w}
                     onClick={() => {
                       setWeightKg(w);
-                      speakText(`${w} ${t('kg')}`);
                     }}
                     className={`py-3 rounded-xl border text-sm font-bold transition-all ${
                       weightKg === w
