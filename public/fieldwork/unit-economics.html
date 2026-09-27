@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Economics Assessment - E-Waste Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="report-container">
+        
+        <!-- Navigation Bar -->
+        <nav class="report-nav">
+            <div class="nav-brand">
+                <i class="fa-solid fa-recycle nav-logo-icon"></i>
+                <span class="brand-text">E-Waste Circular Platform</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link"><i class="fa-solid fa-clipboard-list"></i> Field Visit Report</a>
+                <a href="unit-economics.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Unit Economics Assessment</a>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="report-header">
+            <h1 class="report-title">Unit Economics & Financial Assessment Report</h1>
+            <div class="meta-info">
+                <span><strong>Framework:</strong> E-Waste (Management) Rules, 2022</span> | 
+                <span><strong>Primary Source:</strong> Ground Research & Collector Interviews (21/09/2026)</span>
+            </div>
+        </header>
+
+        <!-- Primary Field Data Disclaimer Box -->
+        <div class="callout-note" style="border-left-color: #2d6a4f; background-color: #f1f8f3; margin-bottom: 22px;">
+            <i class="fa-solid fa-clipboard-check" style="color: #2d6a4f; font-size: 22px;"></i>
+            <div>
+                <strong>Primary Ground Data Source:</strong> All baseline buying rates, weight aggregation volumes, and merchant margins presented in this report represent <strong>real-world data directly gathered during our on-site field visits and interviews with informal scrap collectors and N.R.A Scrap Merchant (Bikasipura, Bengaluru)</strong> on 21/09/2026.
+            </div>
+        </div>
+
+        <!-- KPI Metric Row -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Collector Income Boost</span>
+                    <span class="kpi-value text-success">+28% to +53%</span>
+                    <span class="kpi-sub">Direct authorized pricing</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Collector App Cost</span>
+                    <span class="kpi-value text-primary">₹0 (Free)</span>
+                    <span class="kpi-sub">Zero deductions for collectors</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-certificate"></i></div>
+                <div class="kpi-content">
+                    <span class="kpi-label">EPR Premium Added</span>
+                    <span class="kpi-value text-success">₹15 – ₹60 / kg</span>
+                    <span class="kpi-sub">From authorized recyclers</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="kpi-content">
+                    <span class="kpi-label">Platform Take Rate</span>
+                    <span class="kpi-value text-accent">2.5% – 3.0%</span>
+                    <span class="kpi-sub">Paid solely by recyclers</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Material-Level Unit Economics Table -->
+        <section class="content-section">
+            <h2 class="section-title"><i class="fa-solid fa-table-list"></i> 1. Material-by-Material Unit Realization (Field Data vs. Platform)</h2>
+            <div class="table-responsive">
+                <table class="economics-table">
+                    <thead>
+                        <tr>
+                            <th>Material Stream</th>
+                            <th>Field Informal Price (₹/kg)</th>
+                            <th>Recycler Base Rate (₹/kg)</th>
+                            <th>EPR Incentive (₹/kg)</th>
+                            <th>Platform Net Price (₹/kg)</th>
+                            <th>Collector Gain</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>High-Grade PCBs</strong> (Smartphones/Motherboards)</td>
+                            <td>₹650</td>
+                            <td>₹820</td>
+                            <td>+ ₹60</td>
+                            <td class="text-success font-bold">₹880 / kg</td>
+                            <td><span class="badge badge-success">+35.4%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Medium/Low PCBs</strong> (TVs, Appliances)</td>
+                            <td>₹160</td>
+                            <td>₹205</td>
+                            <td>+ ₹25</td>
+                            <td class="text-success font-bold">₹230 / kg</td>
+                            <td><span class="badge badge-success">+43.8%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Li-Ion / Mobile Batteries</strong></td>
+                            <td>₹180</td>
+                            <td>₹240</td>
+                            <td>+ ₹35</td>
+                            <td class="text-success font-bold">₹275 / kg</td>
+                            <td><span class="badge badge-success">+52.8%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Insulated Copper Cables</strong></td>
+                            <td>₹380</td>
+                            <td>₹440</td>
+                            <td>+ ₹15</td>
+                            <td class="text-success font-bold">₹455 / kg</td>
+                            <td><span class="badge badge-success">+19.7%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Motors & Magnet Assemblies</strong> (Hard Drives/Coils)</td>
+                            <td>₹120</td>
+                            <td>₹155</td>
+                            <td>+ ₹15</td>
+                            <td class="text-success font-bold">₹170 / kg</td>
+                            <td><span class="badge badge-success">+41.7%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>CRTs & Display Panels</strong></td>
+                            <td>₹12</td>
+                            <td>₹18</td>
+                            <td>+ ₹8</td>
+                            <td class="text-success font-bold">₹26 / kg</td>
+                            <td><span class="badge badge-success">+116.7%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mixed Engineering E-Plastics</strong> (ABS/PC)</td>
+                            <td>₹22</td>
+                            <td>₹28</td>
+                            <td>+ ₹4</td>
+                            <td class="text-success font-bold">₹32 / kg</td>
+                            <td><span class="badge badge-success">+45.5%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2. Ground Monthly Impact Case Studies -->
+        <section class="content-section">
+            <h2 class="section-title"><i class="fa-solid fa-users-viewfinder"></i> 2. Collector Monthly Financial Impact (Field Ground Cases)</h2>
+            <div class="persona-grid">
+                <!-- Case 1 -->
+                <div class="persona-card">
+                    <div class="persona-badge"><i class="fa-solid fa-store"></i> Field Case A: Scrap Merchant</div>
+                    <h3 class="persona-title">Fixed Scrap Godown (e.g. N.R.A Scrap)</h3>
+                    <p class="persona-desc">Volume: ~1,800 kg/month with 90% digital payment adoption.</p>
+                    <div class="persona-financials">
+                        <div class="p-row">
+                            <span>Informal Net Monthly Profit:</span>
+                            <span class="text-danger">₹26,000</span>
+                        </div>
+                        <div class="p-row formal-row">
+                            <span>Platform Net Monthly Profit:</span>
+                            <span class="text-success font-bold">₹54,200</span>
+                        </div>
+                    </div>
+                    <div class="persona-impact">
+                        <i class="fa-solid fa-circle-check text-success"></i> <strong>+₹28,200/month (+108.5% Net Profit)</strong> by skipping regional middleman cuts and faster batch turnover of stored items.
+                    </div>
+                </div>
+
+                <!-- Case 2 -->
+                <div class="persona-card">
+                    <div class="persona-badge"><i class="fa-solid fa-person-walking"></i> Field Case B: Street Hawker</div>
+                    <h3 class="persona-title">Door-to-Door Waste Collector</h3>
+                    <p class="persona-desc">Volume: ~150 kg e-waste & appliances collected per month.</p>
+                    <div class="persona-financials">
+                        <div class="p-row">
+                            <span>Informal Net Monthly Income:</span>
+                            <span class="text-danger">₹12,150</span>
+                        </div>
+                        <div class="p-row formal-row">
+                            <span>Platform Net Monthly Income:</span>
+                            <span class="text-success font-bold">₹18,550</span>
+                        </div>
+                    </div>
+                    <div class="persona-impact">
+                        <i class="fa-solid fa-circle-check text-success"></i> <strong>+₹6,400/month (+52.7% Income Lift)</strong> via spoken audio fair rates and verified weight receipts.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Platform Sustainability & Revenue Model -->
+        <section class="content-section">
+            <h2 class="section-title"><i class="fa-solid fa-coins"></i> 3. Platform Business Sustainability</h2>
+            <p class="narrative-text">
+                The platform is <strong>completely free for informal scrap collectors</strong> to prevent compliance burden. Revenue is generated sustainably from the formal recycling industry:
+            </p>
+            <div class="revenue-pillars-grid">
+                <div class="pillar-card">
+                    <h4 class="pillar-title"><i class="fa-solid fa-certificate text-success"></i> 1. Recycler EPR Traceability Fee</h4>
+                    <p class="pillar-desc">Authorized recyclers pay <strong>2.5% – 3.0%</strong> on verified lots to receive GPS-tagged, photo-audited digital dossiers for statutory CPCB EPR compliance.</p>
+                </div>
+                <div class="pillar-card">
+                    <h4 class="pillar-title"><i class="fa-solid fa-truck-ramp-box text-success"></i> 2. Bulk Logistics Batching Surcharge</h4>
+                    <p class="pillar-desc">A <strong>1.5% routing fee</strong> on clustered bulk dispatches from local scrap godowns, cutting transport costs by 35%.</p>
+                </div>
+            </div>
+
+            <!-- Single Line Unit Economic Proof -->
+            <div class="callout-note" style="margin-top: 12px;">
+                <i class="fa-solid fa-chart-simple"></i>
+                <div>
+                    <strong>Unit Economics per 50kg Lot:</strong> Gross Lot Value = <strong>₹11,500</strong> | Platform 3% Recycler Fee = <strong>₹345</strong> | Server & ML inference cost = <strong>-₹5.20</strong> &rarr; <span class="text-success font-bold">Net Platform Contribution = +₹339.80 / lot (83%+ Gross Margin)</span>.
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="report-footer">
+            <p>E-Waste Informal Scrap Collector Integration & EPR Digital Traceability Platform</p>
+            <p class="footer-sub">Field Visit & Unit Economics Assessment • Bengaluru Ground Data</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
