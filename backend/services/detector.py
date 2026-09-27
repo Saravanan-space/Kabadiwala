@@ -1,3 +1,6 @@
+import os
+os.environ["YOLO_CONFIG_DIR"] = os.getenv("YOLO_CONFIG_DIR", "/tmp/Ultralytics")
+
 import numpy as np
 from PIL import Image
 from ultralytics import YOLO

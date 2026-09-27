@@ -11,6 +11,8 @@ services:
     envVars:
       - key: ALLOWED_ORIGINS
         value: "*"
+      - key: YOLO_CONFIG_DIR
+        value: /tmp/Ultralytics
 
   # -------------------------------------------------------------
   # 2. Next.js Frontend App
