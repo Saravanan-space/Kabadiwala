@@ -155,7 +155,7 @@ export function RateCardTab({ onRatesUpdated }: RateCardTabProps) {
       </div>
 
       {/* Rates List */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {rates.map((item) => {
           const itemTitle = getTitle(item);
           const isEditing = editingId === item.id;
@@ -164,7 +164,7 @@ export function RateCardTab({ onRatesUpdated }: RateCardTabProps) {
           return (
             <div
               key={item.id}
-              className={`bg-white rounded-3xl p-4 border transition-all ${
+              className={`bg-white rounded-3xl p-4 sm:p-5 border transition-all flex flex-col justify-between ${
                 item.isActive
                   ? 'border-slate-200/90 shadow-sm hover:shadow-md'
                   : 'border-slate-200 opacity-60 bg-slate-50'

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '../i18n/useTranslation';
+import { DemoModeBanner } from '../components/common/DemoModeBanner';
 
 export const metadata: Metadata = {
   title: 'KABADIWALA - Smart Collection. Fair Prices. Responsible Recycling.',
@@ -10,9 +11,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: '#ffffff',
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: '#065f46',
 };
 
 export default function RootLayout({
@@ -23,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="bg-slate-50 text-slate-900 min-h-screen">
+        <DemoModeBanner />
         <LanguageProvider>
           {children}
         </LanguageProvider>
@@ -30,3 +33,4 @@ export default function RootLayout({
     </html>
   );
 }
+

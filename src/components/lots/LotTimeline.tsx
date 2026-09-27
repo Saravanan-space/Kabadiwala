@@ -13,7 +13,7 @@ export const LotTimeline: React.FC<LotTimelineProps> = ({ status }) => {
     { key: 'created', label: 'Lot Created' },
     { key: 'identified', label: 'Material Identified' },
     { key: 'recycler', label: 'Recycler Selected' },
-    { key: 'pickup', label: 'Pickup Scheduled' },
+    { key: 'pickup_en_route', label: 'Pickup Person On The Way' },
     { key: 'handover', label: 'Digital Handover' },
     { key: 'payment', label: 'Payment Pending' },
     { key: 'completed', label: 'Completed' },
@@ -25,7 +25,9 @@ export const LotTimeline: React.FC<LotTimelineProps> = ({ status }) => {
       case 'Ready for Recycler': return 1;
       case 'Recycler Selected': return 2;
       case 'Pickup Scheduled': return 3;
-      case 'Handed Over': return 4;
+      case 'Pickup Person On The Way': return 3;
+      case 'Handed Over':
+      case 'Handover Pending': return 4;
       case 'Payment Pending': return 5;
       case 'Completed': return 6;
       default: return 1;

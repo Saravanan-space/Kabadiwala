@@ -71,18 +71,18 @@ export function HelpSectionScreen({ onBack }: HelpSectionScreenProps) {
       />
 
       {/* Main Content matching reference UI */}
-      <div className="max-w-md mx-auto px-6 py-8 flex flex-col items-center text-center my-auto space-y-6">
+      <div className="max-w-md sm:max-w-2xl md:max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex flex-col items-center text-center my-auto space-y-6 sm:space-y-8 w-full">
         {/* Big Circular Green Icon Container matching reference image */}
-        <div className="w-56 h-56 rounded-full border-4 border-emerald-600/30 bg-emerald-100/80 flex items-center justify-center shadow-lg">
-          <IconComp className="w-28 h-28 text-emerald-800 stroke-[1.8]" />
+        <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full border-4 border-emerald-600/30 bg-emerald-100/80 flex items-center justify-center shadow-lg">
+          <IconComp className="w-24 h-24 sm:w-28 sm:h-28 text-emerald-800 stroke-[1.8]" />
         </div>
 
         {/* Title & Description */}
-        <div className="space-y-3 px-2">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+        <div className="space-y-3 px-2 max-w-xl">
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
             {currentStep.title}
           </h2>
-          <p className="text-slate-600 font-medium text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-600 font-medium text-sm sm:text-lg leading-relaxed">
             {currentStep.desc}
           </p>
         </div>
@@ -94,16 +94,16 @@ export function HelpSectionScreen({ onBack }: HelpSectionScreenProps) {
           }
           className={`p-4 rounded-full border-2 transition-all shadow-sm ${
             isPlayingCurrentAudio
-              ? 'bg-emerald-600 text-white border-emerald-600 animate-pulse'
-              : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+              ? 'bg-emerald-600 text-white border-emerald-600 animate-pulse scale-105'
+              : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 active:scale-95'
           }`}
           title={t('read_aloud')}
         >
-          <Volume2 className="w-7 h-7 stroke-[2]" />
+          <Volume2 className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2]" />
         </button>
 
         {/* Pagination Dots Indicator */}
-        <div className="flex items-center gap-2 pt-4">
+        <div className="flex items-center gap-2 pt-2 sm:pt-4">
           {helpSteps.map((_, idx) => (
             <div
               key={idx}
@@ -115,8 +115,8 @@ export function HelpSectionScreen({ onBack }: HelpSectionScreenProps) {
         </div>
       </div>
 
-      {/* Bottom Primary Button matching reference UI */}
-      <div className="max-w-md mx-auto w-full px-4 py-4">
+      {/* Bottom Primary Button */}
+      <div className="max-w-md sm:max-w-2xl md:max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4">
         <button
           onClick={handleNext}
           className="w-full py-4 rounded-2xl bg-emerald-800 hover:bg-emerald-900 active:scale-[0.99] text-white font-bold text-lg shadow-lg shadow-emerald-800/25 flex items-center justify-center gap-2 transition-all"

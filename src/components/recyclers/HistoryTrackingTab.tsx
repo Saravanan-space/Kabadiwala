@@ -13,7 +13,11 @@ import {
   TrendingUp,
   Leaf,
   Trees,
+  FileText,
+  Download,
 } from 'lucide-react';
+import { EPRInvoiceModal } from './EPRInvoiceModal';
+import { buildEPRInvoiceDataFromLot, generateEPRInvoicePDF } from '../../services/eprPdfService';
 
 export interface HistoryRecord {
   id: string;
@@ -32,11 +36,11 @@ const MOCK_HISTORY: HistoryRecord[] = [
   {
     id: 'tx-101',
     lotId: 'KBD-1042',
-    material: 'Cable',
-    weightKg: 7.8,
-    ratePerKg: 210,
-    totalPaid: 1638,
-    paymentMethod: 'UPI',
+    material: 'Mixed E-Waste (8 Items)',
+    weightKg: 6.8,
+    ratePerKg: 157,
+    totalPaid: 1066,
+    paymentMethod: 'UPI Instant',
     customerName: 'Raju Sharma',
     date: 'Today, 04:30 PM',
     status: 'Completed',
@@ -48,7 +52,7 @@ const MOCK_HISTORY: HistoryRecord[] = [
     weightKg: 12.0,
     ratePerKg: 355,
     totalPaid: 4260,
-    paymentMethod: 'Cash',
+    paymentMethod: 'UPI',
     customerName: 'Anil Kumar',
     date: 'Yesterday, 11:15 AM',
     status: 'Completed',
@@ -60,7 +64,7 @@ const MOCK_HISTORY: HistoryRecord[] = [
     weightKg: 15.5,
     ratePerKg: 85,
     totalPaid: 1317,
-    paymentMethod: 'UPI',
+    paymentMethod: 'IMPS',
     customerName: 'Sanjay Gupta',
     date: '20 Sep 2026',
     status: 'Completed',
@@ -82,6 +86,7 @@ const MOCK_HISTORY: HistoryRecord[] = [
 export function HistoryTrackingTab() {
   const { t, speakText, isSpeaking, speakingId } = useLanguage();
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedInvoiceRecord, setSelectedInvoiceRecord] = useState<any | null>(null);
 
   const totalVolumeKg = MOCK_HISTORY.reduce((acc, curr) => acc + curr.weightKg, 0);
   const totalAmountPaid = MOCK_HISTORY.reduce((acc, curr) => acc + curr.totalPaid, 0);
@@ -95,8 +100,46 @@ export function HistoryTrackingTab() {
 
   const isPlayingSummary = isSpeaking && speakingId === 'history-summary-tts';
 
+  const handleDownloadInvoice = (item: HistoryRecord, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const lotObj = {
+      id: item.lotId,
+      material: item.material,
+      verifiedWeight: item.weightKg,
+      weight: item.weightKg,
+      offerPrice: item.ratePerKg,
+      finalAmount: item.totalPaid,
+      customerName: item.customerName,
+      status: 'Completed',
+    };
+    const invoiceData = buildEPRInvoiceDataFromLot(lotObj);
+    generateEPRInvoicePDF(invoiceData);
+  };
+
+  const handleViewInvoice = (item: HistoryRecord) => {
+    const lotObj = {
+      id: item.lotId,
+      material: item.material,
+      verifiedWeight: item.weightKg,
+      weight: item.weightKg,
+      offerPrice: item.ratePerKg,
+      finalAmount: item.totalPaid,
+      customerName: item.customerName,
+      status: 'Completed',
+    };
+    setSelectedInvoiceRecord(lotObj);
+  };
+
   return (
     <div className="space-y-4 font-sans">
+      {/* EPR Invoice Modal */}
+      {selectedInvoiceRecord && (
+        <EPRInvoiceModal
+          lot={selectedInvoiceRecord}
+          onClose={() => setSelectedInvoiceRecord(null)}
+        />
+      )}
+
       {/* Hero Summary Card */}
       <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-5 text-white shadow-xl space-y-4">
         <div className="flex items-center justify-between">
@@ -125,7 +168,7 @@ export function HistoryTrackingTab() {
         <div className="grid grid-cols-2 gap-4 border-t border-emerald-700/50 pt-3">
           <div>
             <span className="text-xs text-emerald-200 font-semibold block">{t('total_purchased')}</span>
-            <span className="text-2xl sm:text-3xl font-black text-white">{totalVolumeKg} kg</span>
+            <span className="text-2xl sm:text-3xl font-black text-white">{totalVolumeKg.toFixed(1)} kg</span>
           </div>
 
           <div>
@@ -160,19 +203,24 @@ export function HistoryTrackingTab() {
       </div>
 
       {/* History Log List */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
-        <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-2">
-          Transaction Audit Log ({filteredHistory.length})
-        </h3>
+      <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
+            Transaction Audit Log & EPR Invoices ({filteredHistory.length})
+          </h3>
+          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            CPCB Verified
+          </span>
+        </div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {filteredHistory.map((item) => {
             const isPlayingItem = isSpeaking && speakingId === `hist-${item.id}`;
 
             return (
               <div
                 key={item.id}
-                className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-all space-y-2"
+                className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-all space-y-3 flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -190,7 +238,7 @@ export function HistoryTrackingTab() {
                 <div className="grid grid-cols-2 gap-1 text-xs font-semibold text-slate-600">
                   <div>
                     <span>Material: </span>
-                    <span className="text-slate-900 font-bold">{item.material}</span>
+                    <span className="text-slate-900 font-bold truncate block">{item.material}</span>
                   </div>
 
                   <div>
@@ -200,13 +248,32 @@ export function HistoryTrackingTab() {
 
                   <div>
                     <span>Customer: </span>
-                    <span className="text-slate-900 font-bold">{item.customerName}</span>
+                    <span className="text-slate-900 font-bold truncate block">{item.customerName}</span>
                   </div>
 
                   <div>
                     <span>Payment: </span>
                     <span className="text-slate-900 font-bold">{item.paymentMethod}</span>
                   </div>
+                </div>
+
+                {/* EPR Action Buttons */}
+                <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-200">
+                  <button
+                    onClick={() => handleViewInvoice(item)}
+                    className="py-2 px-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center justify-center gap-1 transition-all"
+                  >
+                    <FileText className="w-3 h-3 text-emerald-400" />
+                    <span>View Invoice</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => handleDownloadInvoice(item, e)}
+                    className="py-2 px-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-[11px] flex items-center justify-center gap-1 transition-all active:scale-95 shadow-xs"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span>PDF</span>
+                  </button>
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium pt-1 border-t border-slate-100">

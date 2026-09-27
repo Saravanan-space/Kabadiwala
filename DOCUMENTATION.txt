@@ -1,0 +1,566 @@
+================================================================================
+                    KABADIWALA CONNECT (E-WASTE & SCRAP NETWORK)
+                    COMPREHENSIVE SYSTEM & FLOW DOCUMENTATION
+================================================================================
+
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY & PROBLEM STATEMENT
+2. TECHNOLOGY STACK & ARCHITECTURE OVERVIEW
+3. DUAL-USER PERSONA SYSTEM (SELLER VS RECYCLER)
+4. DETAILED FEATURE BREAKDOWN
+   4.1. Multilingual Support & Voice-First (TTS) Accessibility
+   4.2. AI Computer Vision Scanner & YOLO E-Waste Detection
+   4.3. Dynamic Rate Card & Market Price Tracker
+   4.4. Per-Material Rate Entry & Real-Time Anomaly Detection
+   4.5. Quote-Lock Mechanism & Rate Guarantee Protocol
+   4.6. Interactive GPS Geolocation & Address Picker
+   4.7. Dispatch Management, Gated Authorization & Real-Time Driver Tracking
+   4.8. Verified Handover, Calibrated Weighing & Instant Settlement
+   4.9. Six Structured E-Waste Datasets & CSV Export Engine
+   4.10. Statutory Form 6 Manifest & EPR Certificate Generation (PDF)
+   4.11. Earnings Ledger, Wallet & Financial History
+   4.12. Intelligent AI Chatbot Assistant
+   4.13. Hazardous Waste Safety & Handling Guidelines
+   4.14. Multi-Tab Demonstration Mode Helper (?demo=true)
+5. STEP-BY-STEP FLOWS & USABILITY
+   5.1. Household / Collector Seller Flow (End-to-End)
+   5.2. Authorized Recycler Operational Flow (End-to-End)
+   5.3. Quote Negotiation & Quote-Lock Flow
+   5.4. Voice Navigation & AI Chatbot Flow
+6. SCREEN-BY-SCREEN & COMPONENT GUIDE
+7. DATA MODELS & BACKEND API SPECIFICATIONS
+   7.1. TypeScript Data Models
+   7.2. Material Transactions Schema
+   7.3. Six Standard Dataset Schemas & Export Filenames
+   7.4. FastAPI Backend Endpoints
+8. REGULATORY & STATUTORY COMPLIANCE (E-Waste Management Rules & EPR)
+9. GETTING STARTED & EXECUTION GUIDE
+
+================================================================================
+1. EXECUTIVE SUMMARY & PROBLEM STATEMENT
+================================================================================
+
+Kabadiwala Connect is a next-generation circular economy digital platform 
+designed to formalize, streamline, and secure the e-waste and scrap collection 
+ecosystem in India. 
+
+The Problem:
+In India, over 90% of electronic waste (e-waste) is handled by the unorganized, 
+informal sector (local kabadiwalas and scrap aggregators). Informal collectors 
+often lack:
+- Transparent, real-time scrap market pricing.
+- Accurate technical classification of complex e-waste components (e.g., PCBs, 
+  lithium-ion batteries, optical sensors, copper windings).
+- Direct access to authorized, government-certified recyclers (MPCB/CPCB).
+- Binding price guarantees against arbitrary deductions during pickup.
+- Safety guidelines to protect themselves against toxic hazards (lead, mercury, 
+  cadmium, battery acid).
+- Legitimate documentation needed for Extended Producer Responsibility (EPR) 
+  compliance mandated by the Ministry of Environment, Forest and Climate Change.
+
+The Solution:
+Kabadiwala Connect bridges the gap between individual households, informal 
+collectors, aggregators, and government-authorized formal recycling centers. 
+Equipped with computer vision AI for instant multi-item scrap valuation, 
+per-material rate bidding with real-time anomaly detection, binding quote-lock 
+guarantees, gated dispatch controls, interactive GPS tracking, automated Form 6 
+statutory manifest generation, six structured data schemas, and multilingual 
+voice-first accessibility, it transforms e-waste recycling into a transparent, 
+profitable, and compliant operation.
+
+================================================================================
+2. TECHNOLOGY STACK & ARCHITECTURE OVERVIEW
+================================================================================
+
+Frontend Architecture:
+- Framework: Next.js (App Router, React 19 / React 18, TypeScript)
+- Styling: Modern TailwindCSS & CSS3 with high-contrast, accessible palettes,
+  glassmorphic cards, responsive grid systems, and subtle micro-animations.
+- Icons & Visuals: Lucide React, Canvas Confetti for transaction milestones.
+- Multilingual Audio / TTS: Native Web Speech API integrated with custom 
+  multilingual translations across 4 Indian languages.
+- Document Generation: jsPDF and jsPDF-AutoTable for client-side generation 
+  of legally compliant Form 6 EPR Certificates.
+- Data Export: Built-in Blob-based CSV export engine for all 6 structured e-waste datasets.
+
+Backend Architecture:
+- Framework: FastAPI (Python 3.9+) with asynchronous request handling and CORS.
+- AI / Deep Learning: YOLOv8 (Ultralytics) running on a custom-trained model 
+  weights (`best.pt`) optimized for electronic scrap components.
+- Image Processing: Pillow (PIL) and NumPy for bounding box spatial calculations 
+  and multi-object segmentation.
+- Fallback Heuristics: Secondary classification engine that analyzes visual 
+  and density features if YOLO confidence is sub-threshold or scrap is heavily mixed.
+
+================================================================================
+3. DUAL-USER PERSONA SYSTEM (SELLER VS RECYCLER)
+================================================================================
+
+The application provides two dedicated, persona-tailored interfaces accessible 
+from the Role Selection screen or switched dynamically from the header:
+
+1. Collector & Aggregator / Household Seller Portal ('user'):
+   - Designed with high-accessibility, intuitive cards, large click targets, and 
+     read-aloud voice support for informal kabadiwalas and household sellers.
+   - Core capabilities: AI camera scanning, scrap valuation, reviewing locked quotes 
+     with per-material breakdowns, accepting/declining quotes, choosing between 
+     doorstep pickup or center drop-off, selecting certified recyclers, tracking 
+     pickup drivers live, verifying digital scale weights, and collecting digital 
+     or cash payments.
+
+2. Authorized Recycler Partner Portal ('recycler'):
+   - Designed for formal e-waste dismantling facilities (e.g., GreenCycle 
+     Recycling, authorized by state pollution control boards).
+   - Core capabilities: Live incoming scrap lot queue, per-material buying rate 
+     quotation with real-time anomaly detection, instant subtotal/grand total 
+     calculation, quote-locking, gated driver dispatch (enabled only upon collector 
+     acceptance), verifying physical weights on calibrated scales, updating daily 
+     buying rate cards, downloading Form 6 Manifests & EPR certificates, maintaining 
+     compliance audit logs, and exploring/exporting the six structured e-waste datasets.
+
+================================================================================
+4. DETAILED FEATURE BREAKDOWN
+================================================================================
+
+4.1. Multilingual Support & Voice-First (TTS) Accessibility
+-----------------------------------------------------------
+- 4 Supported Languages:
+  1. English (Default)
+  2. Hindi (हिंदी)
+  3. Kannada (ಕನ್ನಡ)
+  4. Marathi (मराठी)
+- Voice-First Audio Assistance:
+  - Every major card, page header, role description, and safety instruction 
+    features a dedicated speaker icon.
+  - When pressed, the app's Text-To-Speech (TTS) synthesizer reads the text 
+    aloud in the user's selected language.
+  - This bridges the literacy gap, ensuring informal collectors can operate the 
+    platform without difficulties.
+
+4.2. AI Computer Vision Scanner & YOLO E-Waste Detection
+--------------------------------------------------------
+- Users can take a live photo or upload an image of their scrap pile.
+- The image is processed through the FastAPI backend's YOLOv8 model (`best.pt`).
+- Detection Capabilities:
+  - Computer Keyboards
+  - Smartphones & Mobile Devices
+  - Laptops & Notebooks
+  - Optical Mice
+  - Copper Cables & Power Adapters
+  - Digital Cameras & Sensors
+  - Tablet Screens & Display Panels
+  - Printed Circuit Boards (PCBs)
+  - Lithium Battery Packs
+  - Copper Motors & Compressors
+  - Floppy Disks / VHS Media
+- Bounding Box Overlays: Interactive colored bounding boxes are drawn over the 
+  uploaded image showing detected items with confidence scores.
+- Multi-Item Detection & Cart Builder: Multiple components detected in a single 
+  image are automatically parsed into individual line items with estimated weight, 
+  current price per kg, and total calculated value.
+
+4.3. Dynamic Rate Card & Market Price Tracker
+---------------------------------------------
+- Live tracking of e-waste scrap market rates per kilogram (INR/kg).
+- Real-time trend indicators (Price Up, Stable, Price Down).
+- Transparent price comparison across all categories:
+  - Laptops: ₹500 - ₹550/kg
+  - Smartphones: ₹420 - ₹480/kg
+  - PCBs (Circuit Boards): ₹340 - ₹370/kg
+  - Digital Cameras: ₹300 - ₹400/kg
+  - Copper Cables: ₹180 - ₹240/kg
+  - Motors & Compressors: ₹120 - ₹160/kg
+  - Keyboards: ₹100 - ₹130/kg
+  - Optical Mice: ₹90 - ₹120/kg
+  - Lithium Batteries: ₹60 - ₹90/kg
+  - Display Panels: ₹70 - ₹100/kg
+  - VHS / Media: ₹40 - ₹60/kg
+
+4.4. Per-Material Rate Entry & Real-Time Anomaly Detection
+----------------------------------------------------------
+- In the Recycler Dashboard (`IncomingLotsTab.tsx` / `QuoteRatesModal.tsx`), recyclers 
+  can quote individual, itemized rates for every material detected in a lot.
+- Reference District Median Rates:
+  * Laptops: ₹520/kg
+  * Smartphones: ₹450/kg
+  * PCBs / Circuit boards: ₹355/kg
+  * Digital cameras: ₹350/kg
+  * Copper cables: ₹210/kg
+  * Motors & compressors: ₹140/kg
+  * Keyboards: ₹115/kg
+  * Optical mice: ₹105/kg
+  * Lithium batteries: ₹75/kg
+  * Display panels: ₹85/kg
+  * Mixed e-waste: ₹180/kg
+- Real-Time Rate Anomaly Feedback:
+  * If a recycler enters a rate more than 15% below the district average (`rate < median * 0.85`), 
+    an amber warning box displays immediately:
+    "⚠ This rate is ₹[X] below the district average of ₹[median]/kg. Collector will be notified of the below-market offer."
+  * If the entered rate is above the district median (`rate > median`), a green checkmark displays:
+    "Above market rate — competitive offer."
+  * If within 15% of the median, no extra warning is shown.
+  * Note: The warning is informational and does not block submission.
+- Calculation & Persistence:
+  * Subtotal per line item = `Rate (₹/kg) × Declared Weight (kg)`
+  * Grand Total Committed Quote (₹)
+  * Confirmed quotes are recorded in `material_transactions` schema with fields: 
+    `lot_id`, `material_category`, `weight_kg`, `rate_per_kg`, `subtotal_inr`, `recycler_id`, `timestamp`.
+
+4.5. Quote-Lock Mechanism & Rate Guarantee Protocol
+---------------------------------------------------
+- After the recycler submits the per-material rates, the lot is transitioned to 
+  the status **`Quote Locked`** (`quoteStatus: 'locked'`).
+- The quoted unit rates are stored immutably against the lot ID.
+- Status Badge Styling:
+  * **Quote Locked**: Styled with a green/success background badge (`bg-emerald-50 text-emerald-700 border-emerald-200`) 
+    featuring a lock icon and text: `"Quote Locked · ₹[total amount]"` (calculated from `quotedRates`).
+  * **Quote Declined**: Styled with an amber/warning background badge (`bg-amber-50 text-amber-700 border-amber-200`) 
+    with text: `"Quote Declined — Finding New Recycler"`.
+- Seller Side Experience (`LotDetailsScreen.tsx`):
+  * Displays a dedicated read-only locked quote breakdown table detailing each 
+    material, declared weight, unit rate committed by the recycler, and subtotal payout.
+  * Two prominent action buttons:
+    1. **"Accept Quote"**: Locks in the agreement, sets `quoteStatus: 'accepted'`, 
+       and enables doorstep pickup dispatch.
+    2. **"Decline and Find Another Recycler"**: Resets the lot status to `Finding Recycler` 
+       (`quoteStatus: 'declined'`), allowing the collector to choose a different recycler.
+- Binding Rate Guarantee:
+  * Once accepted, the unit rates (₹/kg) cannot be altered by the recycler.
+  * Physical scale weigh-in during pickup only adjusts the weight quantity, 
+    strictly honoring the locked unit rates.
+
+4.6. Interactive GPS Geolocation & Address Picker
+-------------------------------------------------
+- Integrated interactive GPS map picker (`InteractiveGPSMapPicker`).
+- Automatically detects current GPS coordinates with accuracy circle display.
+- Allows users to drag the marker or tap on the map to pinpoint exact scrap 
+  storage or pickup location.
+- Reverse geocoding resolves latitude and longitude into street, landmark, city, 
+  and PIN code.
+
+4.7. Dispatch Management, Gated Authorization & Real-Time Driver Tracking
+-------------------------------------------------------------------------
+- Gated Dispatch Authorization:
+  * On each incoming lot card in the Recycler Dashboard, the "Notify Pickup Person On The Way" 
+    button is **disabled and visually grayed out** if `lot.quoteStatus !== 'accepted'`.
+  * Helper tooltip/text below the disabled button explains:
+    "Complete rate entry and await collector acceptance before dispatching."
+  * Once the collector clicks "Accept Quote", the dispatch button activates immediately.
+- Driver Assignment & En-Route Notification:
+  * The recycler inputs driver name, phone, vehicle number, and ETA minutes.
+  * The seller receives a live notification banner: "Pickup Partner En Route" with 
+    countdown timer, driver contact, vehicle plate, and live route tracking.
+
+4.8. Verified Handover, Calibrated Weighing & Instant Settlement
+---------------------------------------------------------------
+- Step-by-step physical handover protocol to eliminate cheating and price disputes.
+- 3-Way Weight Verification:
+  1. Estimated Weight (AI estimated).
+  2. Seller's Declared Weight.
+  3. Verified Weight measured on the certified digital scale at handover.
+- Weight Discrepancy Calculator: Automatically recomputes final payout based on 
+  certified scale readings using the immutable locked rates.
+- Digital OTP / Security PIN: Handover requires exchanging a unique 4-digit PIN.
+- Payment Mode: Instant Cash Payout or Direct UPI/Bank Transfer with transaction 
+  reference ID.
+
+4.9. Six Structured E-Waste Datasets & CSV Export Engine
+--------------------------------------------------------
+- Located under the **"Datasets"** tab in the Recycler Dashboard (`DatasetsTab.tsx`).
+- Provides 6 relational dataset schemas populated with realistic Indian e-waste 
+  mock data with working **"Download CSV"** buttons that generate exact filenames:
+  1. `material_dataset.csv`: Physical & chemical taxonomy, hazard levels, critical 
+     mineral contents (Li/Co/Nd/Ta/Ga/In), and EPR applicability.
+  2. `price_dataset.csv`: District-level time-series buying rates, transaction sample 
+     counts, week start dates, and trend directions.
+  3. `recycler_dataset.csv`: SPCB/MPCB license numbers, CPCB registrations, facility 
+     GPS coordinates, accepted material categories, and authorization statuses.
+  4. `transaction_traceability_dataset.csv`: Complete chain of custody logs with 
+     dual weights, rate/kg, photo hashes, GPS coordinates, timestamps, and Form 6 manifests.
+  5. `collector_dataset.csv`: Demographics, preferred vernacular languages, phone hashes, 
+     volumes recycled, and lifetime earnings.
+  6. `ml_training_dataset.csv`: Computer vision training records with YOLO predictions, 
+     human corrections, confidence scores, and feedback sources.
+
+4.10. Statutory Form 6 Manifest & EPR Certificate Generation (PDF)
+------------------------------------------------------------------
+- Compliant with statutory E-Waste (Management) Rules, 2022 (Ministry of 
+  Environment, Forest & Climate Change, Govt. of India).
+- Built-in PDF generator (`services/eprPdfService.ts`) generates official Form 6 
+  E-Waste Manifest and Certificate of Recycling.
+- Certificate contents:
+  * Unique Manifest Reference Number & CPCB/EPR Auth registration details.
+  * Sender / Consignor Details (Name, Seller Ref, Phone, Collection Location).
+  * Authorized Facility / Consignee Details (GreenCycle Recycling, MPCB CTO, 
+    CPCB Registration, Facility Address).
+  * Photographic Evidence Section: Embeds the user's uploaded scrap photo / AI camera scan with verification stamp.
+  * Item-Wise Physical Audit & Valuation Schedule: Perfectly proportioned 8-column layout (S.No, Description, Category, HSN Code, Weight, Rate, EPR Credit, Value INR) with clean table borders and zero clipping.
+  * Payment & Disbursement Settlement schedule (INR Payout, UTR reference).
+  * Quantified Environmental Impact Metrics (CO₂ saved, landfill saved, toxic metals diverted).
+  * Dual Signatures, Recycler Registered Seal & SHA-256 Digital Verification Hash.
+
+4.11. Earnings Ledger, Wallet & Financial History
+-------------------------------------------------
+- Complete financial audit trail for sellers and collectors (`MyEarningsScreen`).
+- Displays lifetime earnings (₹), total kilograms recycled, pending settlements, 
+  and itemized receipts with cash/UPI reference numbers.
+
+4.12. Intelligent AI Chatbot Assistant
+--------------------------------------
+- Floating AI assistant widget (`AIChatbot.tsx`) available across the entire app.
+- Provides instant answers regarding e-waste rates, AI camera scanning, 
+  quote-locking, EPR certificates, pickup logistics, and smart screen navigation.
+
+4.13. Hazardous Waste Safety & Handling Guidelines
+--------------------------------------------------
+- Built-in Safety Guide modal educating informal workers on hazard mitigation:
+  * Handling swollen lithium-ion batteries.
+  * CRT and mercury-containing CCFL backlight precautions.
+  * Lead-acid battery leakage protection.
+  * Personal Protective Equipment (PPE) standards.
+
+4.14. Multi-Tab Demonstration Mode Helper (?demo=true)
+------------------------------------------------------
+- An automated helper banner (`DemoModeBanner.tsx`) rendered at the top of the root layout.
+- Activated dynamically when `?demo=true` is present in the address bar (e.g. `http://localhost:3000?demo=true`).
+- Informs demonstrators:
+  "🎯 Demo Mode — Open this app in two tabs: Tab 1 as Collector, Tab 2 as Recycler, to demonstrate the quote-lock flow end to end."
+- Includes a close (×) button that persists dismissal in `sessionStorage` for the browser session.
+
+4.15. Visual Status Confirmation Modals (Mandatory OK Verification)
+-------------------------------------------------------------------
+- Replaced particle/confetti animations with dedicated, high-contrast modal popups (`StatusConfirmationModal.tsx`).
+- Triggered on critical user actions across the app:
+  * Handover verification & payout confirmation (`VerifyHandoverScreen.tsx`)
+  * Recycler quote acceptance & rate lock (`LotDetailsScreen.tsx`)
+  * Recycler per-material quote entry submission (`IncomingLotsTab.tsx`)
+  * Doorstep pickup person dispatch notifications (`IncomingLotsTab.tsx`)
+  * Authorized recycler assignment (`FindRecyclerScreen.tsx`)
+  * Scrap collection, route waypoint addition, and GPS adjustments (`ScrapCollectorDashboard.tsx`)
+- Displays a prominent green checkmark (`CheckCircle2`), action title, clear explanation, itemized audit details (Lot ID, weights, rates, amounts), and requires the user to explicitly click an "OK / Understood" confirmation button to ensure visual understanding before proceeding.
+
+4.16. Collector-Side Real-Time Price Anomaly Detection & Low Rate Alerts
+-------------------------------------------------------------------------
+- Empowers scrap collectors and household sellers by cross-referencing quoted recycler rates against official district median benchmark pricing in real time (`LotDetailsScreen.tsx`).
+- Automatic Anomaly Flagging:
+  * Analyzes each material item in the recycler's committed quote.
+  * Flags rates that fall ≥ 20% below the fair district market median (e.g., Laptops: ₹520/kg, Smartphones: ₹450/kg, PCBs: ₹355/kg, Cameras: ₹350/kg, Copper Cables: ₹210/kg, Keyboards: ₹115/kg, Floppy Disks: ₹50/kg).
+- Visual Anomaly Indicators:
+  * **Prominent Amber/Rose Warning Banner**: Displays an alert at the top of the quote breakdown informing the seller: "⚠️ Price Anomaly: Value Way Too Low — Recycler quoted rates are significantly lower than current market median."
+  * **Highlighted Table Rows**: Anomaly rows are tinted with a rose background and a prominent left border.
+  * **Per-Item Badges**: Displays a `Way Too Low (-X%)` badge alongside the current rate and explicit market median benchmark (e.g. `⚠️ Market Median: ₹350/kg`).
+  * **Action Card Caution Alert**: Warns collectors right next to the "Accept Quote" and "Decline and Find Another Recycler" buttons so they can make an informed choice to decline unfair bids and solicit better offers from other authorized recyclers.
+
+================================================================================
+5. STEP-BY-STEP FLOWS & USABILITY
+================================================================================
+
+5.1. Household / Collector Seller Flow (End-to-End)
+---------------------------------------------------
+1. Language Onboarding:
+   - Select preferred language (English, Hindi, Kannada, Marathi) with voice previews.
+2. Select Seller Role:
+   - Select "Collector & Aggregator / Household Seller".
+3. AI Camera Scan & Valuation:
+   - Tap "Sell Material", snap photo of scrap.
+   - AI detects components, creates bounding boxes, estimates weight and value.
+4. Logistics & Recycler Selection:
+   - Choose "Doorstep Pickup" (set GPS pin) or "Self Drop-off".
+   - Select preferred authorized recycler (e.g., GreenCycle Recycling).
+5. Quote-Lock Review & Acceptance:
+   - When recycler submits per-material rates, lot status becomes `Quote Locked`.
+   - Seller reviews the itemized rate breakdown table.
+   - Seller clicks "Accept Quote" (or "Decline and Find Another Recycler").
+6. Live Pickup Tracking:
+   - Once accepted, recycler dispatches driver; seller tracks live vehicle route and ETA.
+7. Physical Handover & Settlement:
+   - Driver verifies weight on certified scale, calculates final payout based 
+     on the immutable locked rate, enters 4-digit PIN, and completes payment.
+8. Earnings & EPR Manifest:
+   - Wallet credited with payout; Form 6 EPR certificate ready for download.
+
+5.2. Authorized Recycler Operational Flow (End-to-End)
+------------------------------------------------------
+1. Access Recycler Dashboard:
+   - Switch role to "Authorized Recycler Partner".
+2. Review Incoming Lots:
+   - Navigate to "Lots" tab; review active, in-transit, and pending lots.
+3. Per-Material Quoting & Anomaly Validation:
+   - Click "Quote Per-Material Rates & Lock" on an incoming lot.
+   - Enter ₹/kg buying rate for each detected material item.
+   - System checks rate against district median in real-time (shows warnings/badges).
+   - Review auto-calculated subtotal and grand total.
+   - Click "Lock Quote & Submit" (saves to `material_transactions` and notifies seller).
+4. Gated Dispatching:
+   - While quote is pending review, the dispatch button remains disabled.
+   - Once seller clicks "Accept Quote", click "Notify Pickup Person On The Way".
+   - Enter driver name, phone, vehicle number, and ETA minutes.
+5. Scale Verification & Handover:
+   - Enter verified physical scale weight; system reconciles final payout.
+6. EPR Compliance & Form 6 Manifest:
+   - Generate, preview, and download statutory Form 6 PDF certificate.
+7. Explore Datasets:
+   - Switch to "Datasets" tab to inspect and export all 6 structured e-waste datasets as CSV.
+
+5.3. Quote Negotiation & Quote-Lock Flow
+----------------------------------------
+```
+[Seller Creates Lot] 
+        │
+        ▼
+[Recycler Opens Lot] ──► [Enters Per-Material Rates (₹/kg)]
+        │                               │
+        │                     (Real-Time Anomaly Check)
+        │                               │
+        ▼                               ▼
+[Lot Status: "Quote Locked"] ◄── [Records Material Transactions]
+        │
+        ▼
+[Seller Reviews Locked Breakdown Table]
+   ├──► [Click "Accept Quote"] ──► [quoteStatus: 'accepted' / Rates 100% Locked] ──► [Recycler Dispatches Driver]
+   └──► [Click "Decline"]      ──► [quoteStatus: 'declined' / Status: "Finding Recycler"] ──► [Select Different Recycler]
+```
+
+================================================================================
+6. SCREEN-BY-SCREEN & COMPONENT GUIDE
+================================================================================
+
+1. `DemoModeBanner.tsx`: Top floating banner for multi-tab demonstration mode (`?demo=true`).
+2. `LanguageStartScreen.tsx`: Multilingual onboarding modal with voice previews.
+3. `RoleSelectionScreen.tsx`: High-contrast persona selection (Seller vs Recycler).
+4. `Header.tsx`: Navigation bar with role switcher, language switcher, and global TTS.
+5. `UserMainInterface.tsx`: Main seller dashboard with hero cards and live lot counters.
+6. `SellMaterialFlow.tsx`: Stepper for AI camera upload, detection review, cart building, and GPS map.
+7. `QuoteRatesModal.tsx`: Recycler per-material rate entry modal with real-time median anomaly checking.
+8. `FindRecyclerScreen.tsx`: Comparison directory for authorized recycling centers.
+9. `LotDetailsScreen.tsx`: Detailed lot tracker featuring locked quote table, green Quote Locked / amber Quote Declined badges, and Accept/Decline actions.
+10. `LotCard.tsx`: Reusable lot summary card with `Quote Locked · ₹[total]` (green) and `Quote Declined` (amber) status badges.
+11. `VerifyHandoverScreen.tsx`: Scale weight reconciliation and PIN verification screen.
+12. `RecyclerDashboard.tsx`: Recycler portal managing Lots, Rates, Tracking, Profile, and Datasets.
+13. `IncomingLotsTab.tsx`: Recycler lot queue with per-material quote triggers and gated dispatch controls.
+14. `DatasetsTab.tsx`: 6 structured e-waste dataset tables with working CSV export engine.
+15. `EPRInvoiceModal.tsx`: Form 6 manifest & EPR certificate preview and PDF download modal.
+16. `TodaysRatesScreen.tsx`: Live scrap market rates directory with price trends.
+17. `MyEarningsScreen.tsx`: Financial earnings ledger and payment receipts.
+18. `AIChatbot.tsx`: 24/7 AI conversational assistant with voice support.
+19. `SafetyGuideModal.tsx`: Hazard prevention and PPE safety guide.
+
+================================================================================
+7. DATA MODELS & BACKEND API SPECIFICATIONS
+================================================================================
+
+7.1. TypeScript Data Models (`src/types/lot.ts`)
+------------------------------------------------
+```typescript
+export type LotStatus =
+  | 'Draft'
+  | 'Ready for Recycler'
+  | 'Recycler Selected'
+  | 'Pickup Scheduled'
+  | 'Pickup Person On The Way'
+  | 'Handed Over'
+  | 'Handover Pending'
+  | 'Payment Pending'
+  | 'Completed'
+  | 'Quote Locked'
+  | 'Quote Declined'
+  | 'Finding Recycler';
+
+export interface MaterialQuote {
+  material_category: string;
+  weight_kg: number;
+  rate_per_kg: number;
+  subtotal_inr: number;
+  recycler_id?: string;
+  timestamp?: string;
+}
+
+export interface MaterialTransaction {
+  lot_id: string;
+  material_category: string;
+  weight_kg: number;
+  rate_per_kg: number;
+  subtotal_inr: number;
+  recycler_id: string;
+  timestamp: string;
+}
+
+export interface Lot {
+  id: string;
+  material?: string;
+  weight?: number;
+  priceRange?: string;
+  offerPrice?: number;
+  pickupType?: 'home' | 'self' | 'both';
+  recycler?: any;
+  status: LotStatus;
+  timestamp?: string;
+  quotedRates?: MaterialQuote[];
+  quoteStatus?: 'pending' | 'locked' | 'accepted' | 'declined';
+  quotedTotal?: number;
+  verifiedWeight?: number;
+  finalAmount?: number;
+  customerAddress?: string;
+  dispatchInfo?: any;
+}
+```
+
+7.2. Six Standard Dataset Schemas & Export Filenames
+-----------------------------------------------------
+1. **Material Dataset** (`material_dataset.csv`):
+   `material_id`, `category`, `subcategory`, `hazard_level`, `critical_mineral_content`, `epr_applicable`
+2. **Price Dataset** (`price_dataset.csv`):
+   `price_id`, `material_category`, `district`, `rate_inr_per_kg`, `sample_count`, `week_start_date`, `trend_direction`, `data_source`
+3. **Recycler Dataset** (`recycler_dataset.csv`):
+   `recycler_id`, `facility_name`, `mpcb_license`, `cpcb_registration`, `district`, `state`, `accepted_categories`, `latitude`, `longitude`, `authorization_status`
+4. **Transaction & Traceability Dataset** (`transaction_traceability_dataset.csv`):
+   `transaction_id`, `lot_id`, `collector_id`, `recycler_id`, `material_category`, `declared_weight_kg`, `verified_weight_kg`, `rate_per_kg`, `total_inr`, `handover_photo_hash`, `gps_lat`, `gps_lng`, `timestamp`, `form6_reference`
+5. **Collector Dataset** (`collector_dataset.csv`):
+   `collector_id`, `name`, `district`, `preferred_language`, `phone_hash`, `registration_date`, `total_lots`, `total_kg_recycled`, `total_earnings_inr`
+6. **ML Training Dataset** (`ml_training_dataset.csv`):
+   `image_id`, `lot_id`, `image_hash`, `detected_labels`, `collector_corrections`, `final_labels`, `confidence_scores`, `correction_source`, `timestamp`
+
+7.3. FastAPI Backend Endpoints
+------------------------------
+- `GET /`: Health & welcome message.
+- `GET /health`: Health probe.
+- `POST /api/v1/waste/detect`: Multi-item image classification with YOLO bounding boxes and INR valuation.
+
+================================================================================
+8. REGULATORY & STATUTORY COMPLIANCE (EPR & E-Waste Rules)
+================================================================================
+
+Under the E-Waste (Management) Rules established by the Ministry of Environment, 
+Forest and Climate Change (MoEFCC):
+1. Producers must fulfill Extended Producer Responsibility (EPR) mandates via certified recyclers.
+2. All e-waste transfers must maintain an official Form 6 Manifest trail.
+3. Kabadiwala Connect enforces compliance through:
+   - Verified SPCB/CPCB license verification.
+   - Transparent per-material weight and rate logging.
+   - Tamper-evident Form 6 digital manifests.
+   - Quantified environmental impact metrics (CO₂ diverted, heavy metals captured).
+
+================================================================================
+9. GETTING STARTED & EXECUTION GUIDE
+================================================================================
+
+Prerequisites:
+- Node.js (v18.0.0 or later)
+- Python 3.9+ with pip
+
+Starting the Frontend:
+1. Navigate to project root: `cd Kabadiwala`
+2. Install packages: `npm install`
+3. Launch development server: `npm run dev`
+4. Open browser: `http://localhost:3000`
+5. To test in Demo Mode: `http://localhost:3000?demo=true` (open Tab 1 as Collector, Tab 2 as Recycler)
+
+Starting the AI Backend:
+1. Navigate to backend: `cd Kabadiwala/backend`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run FastAPI: `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

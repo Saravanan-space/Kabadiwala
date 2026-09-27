@@ -63,6 +63,8 @@ export const translations: Record<Language, Record<string, string>> = {
     home_pickup_desc: "Recycler picks up from your address",
     self_drop: "Self Drop-off",
     self_drop_desc: "Drop off at nearest recycler center",
+    both_pickup_drop: "Both Pickup & Drop-off",
+    both_pickup_drop_desc: "Doorstep pickup or center drop-off based on convenience",
 
     fair_price_title: "Fair Price",
     local_range: "Local Range",
@@ -223,6 +225,8 @@ export const translations: Record<Language, Record<string, string>> = {
     home_pickup_desc: "रीसाइकलर आपके पते से कचरा उठाएगा",
     self_drop: "खुद जमा करें",
     self_drop_desc: "निकटतम रीसाइकिल केंद्र पर जमा करें",
+    both_pickup_drop: "पिकअप और ड्रॉप-ऑफ दोनों",
+    both_pickup_drop_desc: "सुविधा के अनुसार घर से पिकअप या केंद्र पर जमा करें",
 
     fair_price_title: "सही कीमत",
     local_range: "स्थानीय भाव",

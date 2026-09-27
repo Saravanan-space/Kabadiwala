@@ -14,7 +14,8 @@ import { HelpSectionScreen } from '../components/help/HelpSectionScreen';
 import { MyEarningsScreen } from '../components/earnings/MyEarningsScreen';
 import { RoleSelectionScreen, UserRole } from '../components/common/RoleSelectionScreen';
 import { RecyclerDashboard } from '../components/recyclers/RecyclerDashboard';
-import { Package, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { AIChatbot } from '../components/chat/AIChatbot';
+import { Package, ChevronRight, CheckCircle2, Lock } from 'lucide-react';
 
 type ScreenState =
   | 'home'
@@ -35,17 +36,23 @@ function AppContent() {
   const [userLots, setUserLots] = useState<any[]>([
     {
       id: 'KBD-1042',
-      material: 'Cable',
-      weight: 0.5,
-      priceRange: '₹90–₹110',
-      offerPrice: 210,
+      material: 'Copper Cables & Wire Scrap',
+      weight: 2.5,
+      priceRange: '₹180–₹240/kg',
+      offerPrice: 220,
       pickupType: 'home',
       recycler: {
         name: 'GreenCycle Recycling',
         address: 'MIDC Andheri East, Mumbai',
-        rate: 210,
+        rate: 220,
       },
-      status: 'Handover Pending',
+      status: 'Quote Locked',
+      quoteStatus: 'locked',
+      quotedRates: [
+        { material_category: 'Copper Cables & Wire Scrap', weight_kg: 1.5, rate_per_kg: 220, subtotal_inr: 330 },
+        { material_category: 'Optical Mouse Scrap', weight_kg: 1.0, rate_per_kg: 100, subtotal_inr: 100 },
+      ],
+      quotedTotal: 430,
       timestamp: new Date().toISOString(),
     },
     {
@@ -106,6 +113,8 @@ function AppContent() {
   const activeCount = userLots.filter((l) => l.status !== 'Completed').length;
   const completedCount = userLots.filter((l) => l.status === 'Completed').length;
 
+  const enRouteLot = userLots.find((l) => l.status === 'Pickup Person On The Way');
+
   return (
     <div className="min-h-screen bg-slate-100/60 selection:bg-emerald-500 selection:text-white font-sans text-slate-900">
       {/* 1. Language Start Screen Modal overlay */}
@@ -133,6 +142,44 @@ function AppContent() {
                 onSwitchRecyclerMode={() => handleSelectRole('recycler')}
                 onLogout={handleLogout}
               />
+
+              {/* Real-time En-Route Pickup Live Notification Banner */}
+              {enRouteLot && (
+                <div className="max-w-md sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3">
+                  <div
+                    onClick={() => {
+                      setActiveLotId(enRouteLot.id);
+                      setCurrentScreen('lot_details');
+                    }}
+                    className="p-4 rounded-3xl bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white shadow-lg flex items-center justify-between gap-3 cursor-pointer hover:shadow-xl transition-all border border-amber-400/40 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center font-bold text-xl animate-bounce shrink-0">
+                        🚚
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider bg-white text-amber-900 px-2.5 py-0.5 rounded-full">
+                            Pickup Partner En Route
+                          </span>
+                          <span className="text-xs font-semibold text-amber-200">
+                            {enRouteLot.id}
+                          </span>
+                        </div>
+                        <h4 className="text-sm sm:text-base font-black text-white mt-0.5">
+                          {enRouteLot.dispatchInfo?.driverName || 'Suresh Kumar'} is on the way ({enRouteLot.dispatchInfo?.etaMinutes || 15} mins away)
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="px-3.5 py-2 rounded-2xl bg-white text-amber-900 font-black text-xs shrink-0 group-hover:scale-105 transition-transform flex items-center gap-1 shadow-sm">
+                      <span>Track Live Map</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <UserMainInterface
                 onNavigate={(scr) => setCurrentScreen(scr as ScreenState)}
                 activeLotsCount={activeCount}
@@ -177,6 +224,19 @@ function AppContent() {
           onBack={() => setCurrentScreen('home')}
           lot={selectedLot}
           onVerifyHandover={() => setCurrentScreen('verify_handover')}
+          onAcceptQuote={(lotId) => {
+            handleUpdateLotStatus(lotId, 'Recycler Selected', {
+              quoteStatus: 'accepted',
+            });
+          }}
+          onDeclineQuote={(lotId) => {
+            handleUpdateLotStatus(lotId, 'Finding Recycler', {
+              quoteStatus: 'declined',
+              recycler: null,
+            });
+            setActiveLotId(lotId);
+            setCurrentScreen('find_recycler');
+          }}
         />
       )}
 
@@ -213,7 +273,7 @@ function AppContent() {
       )}
 
       {currentScreen === 'my_lots' && (
-        <div className="min-h-screen bg-slate-50 pb-24">
+        <div className="min-h-screen bg-slate-50 pb-24 font-sans">
           <Header
             title={t('my_lots')}
             subtitle=""
@@ -221,43 +281,79 @@ function AppContent() {
             onBack={() => setCurrentScreen('home')}
             pageAudioText={`${t('my_lots')}. ${userLots.length} total lots.`}
           />
-          <div className="max-w-md mx-auto px-4 py-4 space-y-4">
-            <h2 className="text-xl font-black text-slate-900">{t('my_lots')}</h2>
-            {userLots.map((lot) => (
-              <button
-                key={lot.id}
-                onClick={() => {
-                  setActiveLotId(lot.id);
-                  setCurrentScreen('lot_details');
-                }}
-                className="w-full text-left bg-white rounded-3xl p-4 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                    <Package className="w-6 h-6 stroke-[2]" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-black text-slate-900">
-                        {lot.id}
-                      </h3>
-                      <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        {lot.status}
-                      </span>
+          <div className="max-w-md sm:max-w-2xl md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">{t('my_lots')}</h2>
+              <span className="text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                {userLots.length} Active & Completed Lots
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {userLots.map((lot) => {
+                const isQuoteLocked = lot.status === 'Quote Locked' || lot.quoteStatus === 'locked';
+                const totalDisplayVal = lot.quotedTotal || Math.round(lot.weight * (lot.offerPrice || 210));
+
+                return (
+                  <button
+                    key={lot.id}
+                    onClick={() => {
+                      setActiveLotId(lot.id);
+                      setCurrentScreen('lot_details');
+                    }}
+                    className="w-full text-left bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                        <Package className="w-7 h-7 stroke-[2]" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-lg font-black text-slate-900">
+                            {lot.id}
+                          </h3>
+                          <span
+                            className={`text-xs font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+                              lot.status === 'Completed' || isQuoteLocked
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : lot.status === 'Quote Declined'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-amber-50 text-amber-700 border-amber-200'
+                            }`}
+                          >
+                            {isQuoteLocked ? (
+                              <Lock className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <CheckCircle2 className="w-3 h-3" />
+                            )}
+                            {isQuoteLocked
+                              ? `Quote Locked · ₹${totalDisplayVal.toLocaleString('en-IN')}`
+                              : lot.status === 'Quote Declined'
+                              ? 'Quote Declined — Finding New Recycler'
+                              : lot.status}
+                          </span>
+
+                        </div>
+                        <p className="text-sm font-semibold text-slate-500 mt-1">
+                          {lot.material} • {lot.weight} kg
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm font-semibold text-slate-500 mt-0.5">
-                      {lot.material} • {lot.weight} kg
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            ))}
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
+
         </>
+      )}
+
+      {/* Floating AI Assistant Chatbot */}
+      {isLanguageSelected && userRole && (
+        <AIChatbot onNavigate={(scr) => setCurrentScreen(scr as ScreenState)} />
       )}
     </div>
   );

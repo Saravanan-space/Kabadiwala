@@ -17,14 +17,24 @@ import {
   TrendingUp,
   DollarSign,
   ArrowRight,
+  Navigation,
+  Edit3,
+  Plus,
+  Crosshair,
+  X,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { InteractiveGPSMapPicker } from '../map/InteractiveGPSMapPicker';
+import { LocationCoordinate, DEFAULT_LOCATION } from '../../services/mapService';
+import { StatusConfirmationModal } from '../common/StatusConfirmationModal';
 
 export interface PickupJob {
   id: string;
   customerName: string;
   phone: string;
   address: string;
+  lat?: number;
+  lng?: number;
+  landmark?: string;
   distanceKm: number;
   material: string;
   estWeightKg: number;
@@ -43,6 +53,9 @@ const INITIAL_PICKUPS: PickupJob[] = [
     customerName: 'Ramesh Patel',
     phone: '+91 98201 11223',
     address: 'Bldg 4, Green Acres, MIDC Andheri East, Mumbai',
+    lat: 19.1136,
+    lng: 72.8697,
+    landmark: 'Opposite SEEPZ Gate 1',
     distanceKm: 0.8,
     material: 'Cable & Wires',
     estWeightKg: 8.5,
@@ -55,6 +68,9 @@ const INITIAL_PICKUPS: PickupJob[] = [
     customerName: 'Sunita Rao',
     phone: '+91 97690 44556',
     address: 'Flat 302, Sai Heights, Marol, Mumbai',
+    lat: 19.1197,
+    lng: 72.8864,
+    landmark: 'Near Marol Metro',
     distanceKm: 1.4,
     material: 'PCB & Circuit Boards',
     estWeightKg: 12.0,
@@ -67,6 +83,9 @@ const INITIAL_PICKUPS: PickupJob[] = [
     customerName: 'Deepak Shah',
     phone: '+91 98199 88776',
     address: 'Shop 12, Station Road, Andheri East, Mumbai',
+    lat: 19.1254,
+    lng: 72.8525,
+    landmark: 'Near Station Road East',
     distanceKm: 2.1,
     material: 'Lithium Battery & Motors',
     estWeightKg: 25.0,
@@ -78,10 +97,17 @@ const INITIAL_PICKUPS: PickupJob[] = [
 
 export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardProps) {
   const { t, speakText, isSpeaking, speakingId } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'pickups' | 'batching' | 'summary'>('pickups');
+  const [activeTab, setActiveTab] = useState<'pickups' | 'map' | 'batching' | 'summary'>('pickups');
   const [pickups, setPickups] = useState<PickupJob[]>(INITIAL_PICKUPS);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [collectedWeight, setCollectedWeight] = useState<string>('');
+  const [adjustingLocationJob, setAdjustingLocationJob] = useState<PickupJob | null>(null);
+  const [tempAdjustedLocation, setTempAdjustedLocation] = useState<LocationCoordinate>(DEFAULT_LOCATION);
+  const [isAddingNewLocation, setIsAddingNewLocation] = useState<boolean>(false);
+  const [newCustomerName, setNewCustomerName] = useState<string>('');
+  const [newCustomerPhone, setNewCustomerPhone] = useState<string>('');
+  const [newMaterial, setNewMaterial] = useState<string>('Copper & Cables');
+  const [newWeight, setNewWeight] = useState<string>('5.0');
 
   const completedCount = pickups.filter((p) => p.status === 'Collected' || p.status === 'Delivered').length;
   const totalKgCollected = pickups
@@ -104,8 +130,18 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
     setCollectedWeight(String(job.estWeightKg));
   };
 
+  const [statusModalData, setStatusModalData] = useState<{
+    isOpen: boolean;
+    title: string;
+    subtitle?: string;
+    details?: { label: string; value: string | number }[];
+    buttonText?: string;
+  } | null>(null);
+
   const handleConfirmCollection = (job: PickupJob) => {
     const finalKg = parseFloat(collectedWeight) || job.estWeightKg;
+    const finalPayout = Math.round(finalKg * 200);
+
     setPickups((prev) =>
       prev.map((p) =>
         p.id === job.id
@@ -118,11 +154,18 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
       )
     );
     setSelectedJobId(null);
-
-    confetti({
-      particleCount: 80,
-      spread: 60,
-      origin: { y: 0.6 },
+    setStatusModalData({
+      isOpen: true,
+      title: 'Scrap Collection Recorded',
+      subtitle: 'Doorstep material collection verified and payout settled.',
+      details: [
+        { label: 'Customer Name', value: job.customerName },
+        { label: 'Scrap Material', value: job.material },
+        { label: 'Verified Scale Weight', value: `${finalKg} kg` },
+        { label: 'Cash Settled', value: `₹${finalPayout.toLocaleString('en-IN')}` },
+        { label: 'Status', value: 'Collected & Logged' },
+      ],
+      buttonText: 'OK, Next Waypoint',
     });
   };
 
@@ -179,6 +222,19 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
 
       {/* Main Container */}
       <main className="max-w-md mx-auto px-4 py-4 space-y-4">
+        {/* Force User OK Status Popup Modal */}
+        {statusModalData && (
+          <StatusConfirmationModal
+            isOpen={statusModalData.isOpen}
+            title={statusModalData.title}
+            subtitle={statusModalData.subtitle}
+            details={statusModalData.details}
+            buttonText={statusModalData.buttonText || 'OK, Understood'}
+            type="success"
+            onConfirm={() => setStatusModalData(null)}
+          />
+        )}
+
         {/* KPI Summary Cards */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-amber-800 text-white rounded-2xl p-4 shadow-sm">
@@ -193,40 +249,52 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
         </div>
 
         {/* Tab Navigation */}
-        <div className="grid grid-cols-3 gap-1.5 bg-slate-200/70 p-1.5 rounded-2xl text-xs font-bold">
+        <div className="grid grid-cols-4 gap-1.5 bg-slate-200/70 p-1.5 rounded-2xl text-[11px] font-bold">
           <button
             onClick={() => setActiveTab('pickups')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
               activeTab === 'pickups'
-                ? 'bg-white text-amber-800 shadow-sm font-extrabold'
+                ? 'bg-white text-amber-900 shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Truck className="w-4 h-4" />
+            <Truck className="w-3.5 h-3.5" />
             <span>Route</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('batching')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'batching'
-                ? 'bg-white text-amber-800 shadow-sm font-extrabold'
+            onClick={() => setActiveTab('map')}
+            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'map'
+                ? 'bg-white text-amber-900 shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Layers className="w-4 h-4" />
+            <MapPin className="w-3.5 h-3.5" />
+            <span>GPS Map</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('batching')}
+            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'batching'
+                ? 'bg-white text-amber-900 shadow-sm font-black'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
             <span>Batching</span>
           </button>
 
           <button
             onClick={() => setActiveTab('summary')}
-            className={`py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
               activeTab === 'summary'
-                ? 'bg-white text-amber-800 shadow-sm font-extrabold'
+                ? 'bg-white text-amber-900 shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-3.5 h-3.5" />
             <span>Cashflow</span>
           </button>
         </div>
@@ -289,10 +357,37 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
                   </div>
 
                   {/* Details Card */}
-                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1.5 text-xs font-medium text-slate-700">
-                    <div className="flex items-start gap-1.5">
-                      <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                      <span>{job.address}</span>
+                  {/* Details Card */}
+                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2 text-xs font-medium text-slate-700">
+                    <div className="flex items-start justify-between gap-1.5">
+                      <div className="flex items-start gap-1.5 flex-1">
+                        <MapPin className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-semibold text-slate-900 block">{job.address}</span>
+                          {job.landmark && (
+                            <span className="text-[11px] text-slate-500 block">Note: {job.landmark}</span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Button to adjust location on map */}
+                      <button
+                        onClick={() => {
+                          setAdjustingLocationJob(job);
+                          setTempAdjustedLocation({
+                            lat: job.lat || 19.1136,
+                            lng: job.lng || 72.8697,
+                            address: job.address,
+                            landmark: job.landmark || '',
+                            city: 'Mumbai',
+                          });
+                        }}
+                        className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 hover:border-amber-600 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition-all flex items-center gap-1 shrink-0 shadow-2xs"
+                        title="Adjust Location on Map"
+                      >
+                        <Edit3 className="w-3 h-3 text-amber-700" />
+                        <span>Map Pin</span>
+                      </button>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 font-bold text-slate-900">
@@ -372,6 +467,155 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
           </div>
         )}
 
+        {/* GPS & Map Tab */}
+        {activeTab === 'map' && (
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 text-white p-4 sm:p-5 rounded-3xl shadow-sm space-y-1">
+              <div className="flex items-center gap-2 text-amber-200 text-xs font-bold">
+                <Navigation className="w-4 h-4" />
+                <span>Field Route Navigation & GPS Map</span>
+              </div>
+              <h3 className="text-xl font-black text-white">Interactive Pickup Route Map</h3>
+              <p className="text-amber-100/90 text-xs font-medium">
+                Enter an address or drag pins on the map to fine-tune neighborhood collection spots.
+              </p>
+            </div>
+
+            {/* Interactive GPS Map */}
+            <InteractiveGPSMapPicker
+              initialLocation={tempAdjustedLocation}
+              onLocationSelect={(loc) => setTempAdjustedLocation(loc)}
+              title="Enter Address & Pinpoint on Map"
+              subtitle="Search landmarks, use GPS or drag the marker to adjust exact pickup coordinates"
+            />
+
+            {/* Quick Add Pickup to Route using Pinpointed Location */}
+            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                  <Plus className="w-4 h-4 text-emerald-700" />
+                  Add New Pickup Job at Pinpoint Location
+                </h4>
+                <button
+                  onClick={() => setIsAddingNewLocation(!isAddingNewLocation)}
+                  className="text-xs font-bold text-emerald-800 hover:underline"
+                >
+                  {isAddingNewLocation ? 'Hide Form' : '+ Open Form'}
+                </button>
+              </div>
+
+              {isAddingNewLocation && (
+                <div className="space-y-3 pt-2 border-t border-slate-100 text-xs">
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Customer Name (e.g. Vikas Sharma)"
+                      value={newCustomerName}
+                      onChange={(e) => setNewCustomerName(e.target.value)}
+                      className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-900 focus:bg-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Phone Number (+91...)"
+                      value={newCustomerPhone}
+                      onChange={(e) => setNewCustomerPhone(e.target.value)}
+                      className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-900 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Material (e.g. Copper Cable)"
+                      value={newMaterial}
+                      onChange={(e) => setNewMaterial(e.target.value)}
+                      className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-900 focus:bg-white"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Estimated Weight (kg)"
+                      value={newWeight}
+                      onChange={(e) => setNewWeight(e.target.value)}
+                      className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-900 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 font-bold text-xs flex items-center justify-between">
+                    <span>GPS Target: {tempAdjustedLocation.landmark || tempAdjustedLocation.city}</span>
+                    <span className="text-[10px] text-emerald-700">{tempAdjustedLocation.lat.toFixed(4)}°N</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (!newCustomerName) return;
+                      const newJob: PickupJob = {
+                        id: `JOB-${Math.floor(200 + Math.random() * 800)}`,
+                        customerName: newCustomerName,
+                        phone: newCustomerPhone || '+91 98200 00000',
+                        address: tempAdjustedLocation.address,
+                        lat: tempAdjustedLocation.lat,
+                        lng: tempAdjustedLocation.lng,
+                        landmark: tempAdjustedLocation.landmark,
+                        distanceKm: 1.2,
+                        material: newMaterial || 'Mixed Scrap',
+                        estWeightKg: parseFloat(newWeight) || 5,
+                        estPayout: (parseFloat(newWeight) || 5) * 200,
+                        status: 'Scheduled',
+                        scheduledTime: 'Today',
+                      };
+                      setPickups([newJob, ...pickups]);
+                      setNewCustomerName('');
+                      setNewCustomerPhone('');
+                      setIsAddingNewLocation(false);
+                      setStatusModalData({
+                        isOpen: true,
+                        title: `Waypoint Added to Route`,
+                        subtitle: `New scrap collection scheduled for ${newJob.customerName}.`,
+                        details: [
+                          { label: 'Waypoint ID', value: newJob.id },
+                          { label: 'Customer', value: newJob.customerName },
+                          { label: 'Scrap Type', value: newJob.material },
+                          { label: 'Address', value: newJob.address },
+                        ],
+                        buttonText: 'OK, View Route',
+                      });
+                    }}
+                    className="w-full py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl shadow-sm transition-all"
+                  >
+                    Add Location to Route
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* List of active locations mapped */}
+            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+              <h4 className="font-black text-sm text-slate-900">Current Route Waypoints ({pickups.length})</h4>
+              <div className="space-y-2">
+                {pickups.map((p, idx) => (
+                  <div
+                    key={p.id}
+                    className="p-3 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-amber-800 text-white flex items-center justify-center font-bold text-[10px]">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-900 block">{p.customerName}</span>
+                        <span className="text-[11px] text-slate-500 truncate max-w-[200px] block">
+                          {p.address}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="font-bold text-amber-800">{p.distanceKm} km</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'batching' && (
           <div className="space-y-4">
             <div className="bg-amber-800 text-white rounded-3xl p-5 shadow-md space-y-2">
@@ -427,6 +671,84 @@ export function ScrapCollectorDashboard({ onLogout }: ScrapCollectorDashboardPro
                 <div>
                   <span className="text-xs text-amber-200 font-semibold block">Total Weight</span>
                   <span className="text-2xl font-black text-white">{totalKgCollected} kg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Adjust Location on Map Modal */}
+        {adjustingLocationJob && (
+          <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200 space-y-0">
+              <div className="bg-amber-900 text-white p-4 sm:p-5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-amber-300" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-lg text-white">Adjust Location on Map</h3>
+                    <p className="text-xs text-amber-200 font-medium">
+                      Pickup for {adjustingLocationJob.customerName} ({adjustingLocationJob.id})
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setAdjustingLocationJob(null)}
+                  className="p-2 rounded-full hover:bg-white/10 text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-4">
+                <InteractiveGPSMapPicker
+                  initialLocation={tempAdjustedLocation}
+                  onLocationSelect={(loc) => setTempAdjustedLocation(loc)}
+                  title="Drag Map Pin to Adjust Spot"
+                  subtitle="Search new address or reposition marker directly on the interactive map"
+                />
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    onClick={() => setAdjustingLocationJob(null)}
+                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPickups((prev) =>
+                        prev.map((p) =>
+                          p.id === adjustingLocationJob.id
+                            ? {
+                                ...p,
+                                address: tempAdjustedLocation.address,
+                                lat: tempAdjustedLocation.lat,
+                                lng: tempAdjustedLocation.lng,
+                                landmark: tempAdjustedLocation.landmark,
+                              }
+                            : p
+                        )
+                      );
+                      setAdjustingLocationJob(null);
+                      setStatusModalData({
+                        isOpen: true,
+                        title: 'Waypoint Location Updated',
+                        subtitle: `Updated GPS pin and pickup address for ${adjustingLocationJob.customerName}.`,
+                        details: [
+                          { label: 'Customer', value: adjustingLocationJob.customerName },
+                          { label: 'New Address', value: tempAdjustedLocation.address },
+                          { label: 'Coordinates', value: `${tempAdjustedLocation.lat.toFixed(4)}°N, ${tempAdjustedLocation.lng.toFixed(4)}°E` },
+                        ],
+                        buttonText: 'OK, Got It',
+                      });
+                    }}
+                    className="flex-2 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-md"
+                  >
+                    Save & Update Location
+                  </button>
                 </div>
               </div>
             </div>
