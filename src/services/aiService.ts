@@ -12,6 +12,13 @@ export const MANUAL_CATEGORIES: ManualCategory[] = [
   { id: 'keyboard', name: 'Keyboard / Mouse', hindiName: 'कीबोर्ड / माउस', marathiName: 'कीबोर्ड / माउस', kannadaName: 'ಕೀಬೋರ್ಡ್ / ಮೌಸ್', defaultPriceKg: 120, iconName: 'Box' },
 ];
 
+export function warmupBackend() {
+  if (typeof window === 'undefined') return;
+  try {
+    fetch(`${API_BASE_URL}/health`, { method: 'GET', mode: 'cors' }).catch(() => {});
+  } catch {}
+}
+
 export async function analyzeWaste(
   imageFile: File | Blob,
   isOffline: boolean = false
@@ -20,15 +27,20 @@ export async function analyzeWaste(
     throw new Error('OFFLINE: AI analysis requires an active internet connection.');
   }
 
-  // Attempt backend API call
+  // Attempt backend API call with 7-second timeout protection for cold starts
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+
     const formData = new FormData();
     formData.append('image', imageFile);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/waste/detect`, {
       method: 'POST',
       body: formData,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       const data: WasteDetectionResponse = await response.json();
@@ -37,7 +49,7 @@ export async function analyzeWaste(
       }
     }
   } catch (err) {
-    console.warn('[AI Service] Backend API call failed, using client AI fallback:', err);
+    console.warn('[AI Service] Backend API call slow or failed, using client AI fallback:', err);
   }
 
   // CLIENT FALLBACK (Deep multi-item recognition and valuation)

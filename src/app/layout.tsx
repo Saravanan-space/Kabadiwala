@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '../i18n/useTranslation';
 import { DemoModeBanner } from '../components/common/DemoModeBanner';
+import { BackendWarmer } from '../components/common/BackendWarmer';
 
 export const metadata: Metadata = {
   title: 'KABADIWALA - Smart Collection. Fair Prices. Responsible Recycling.',
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="bg-slate-50 text-slate-900 min-h-screen">
+        <BackendWarmer />
         <DemoModeBanner />
         <LanguageProvider>
           {children}
