@@ -309,6 +309,31 @@ export function AIChatbot({ onNavigate }: AIChatbotProps) {
     const q = query.toLowerCase();
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // 0. Non-accepted items check (Cardboard, Paper, Plastic Bottles, Glass, Clothes)
+    if (
+      q.includes('cardboard') ||
+      q.includes('paper') ||
+      q.includes('carton') ||
+      q.includes('newspaper') ||
+      q.includes('raddi') ||
+      q.includes('bottle') ||
+      q.includes('plastic bottle') ||
+      q.includes('glass') ||
+      q.includes('cloth') ||
+      q.includes('furniture')
+    ) {
+      return {
+        id: `bot_${Date.now()}`,
+        sender: 'bot',
+        text: "🚫 **Kabadiwala Connect exclusively specializes in E-Waste & Electronic/Electrical Scrap recycling**.\n\nWe **do not** purchase or collect:\n• Cardboard, cartons, paper, or newspapers (raddi)\n• Plastic bottles, general household plastics\n• Glass bottles or organic/wet waste\n\nFor these items, please contact your local municipal dry waste center or general scrap dealer.\n\nWe gladly accept **laptops, smartphones, PCBs, copper cables, motors, keyboards, screens, and batteries**! ⚡",
+        timestamp,
+        actionButton: {
+          label: "View Accepted E-Waste Rates →",
+          screen: 'todays_rates',
+        },
+      };
+    }
+
     // 1. Rates Query
     if (q.includes('rate') || q.includes('price') || q.includes('bhav') || q.includes('cost') || q.includes('worth') || q.includes('value')) {
       if (q.includes('phone') || q.includes('mobile') || q.includes('laptop')) {
