@@ -69,6 +69,167 @@ const PRE_TRAINED_QUESTIONS = [
   },
 ];
 
+const mapLabelToScreen = (label: string): string | null => {
+  const l = label.toLowerCase();
+  if (l.includes('sell') || l.includes('scan') || l.includes('photo') || l.includes('camera') || l.includes('upload')) return 'sell';
+  if (l.includes('rate') || l.includes('price') || l.includes('bhav') || l.includes('today')) return 'todays_rates';
+  if (l.includes('recycler') || l.includes('center') || l.includes('facility') || l.includes('near')) return 'find_recycler';
+  if (l.includes('earning') || l.includes('payout') || l.includes('wallet') || l.includes('paid')) return 'my_earnings';
+  if (l.includes('lot') || l.includes('certificate') || l.includes('epr') || l.includes('manifest')) return 'my_lots';
+  if (l.includes('help') || l.includes('support') || l.includes('contact') || l.includes('faq')) return 'help';
+  return null;
+};
+
+function FormattedText({
+  text,
+  isUser,
+  onActionClick,
+}: {
+  text: string;
+  isUser: boolean;
+  onActionClick: (screen: string) => void;
+}) {
+  const parseInline = (str: string) => {
+    const parts: React.ReactNode[] = [];
+    // Matches **bold text**, [Action button/screen], or `code`
+    const regex = /(\*\*[^*]+\*\*|\[[a-zA-Z0-9\s&–—'’/→\-]+\]|`[^`]+`)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(str)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(str.substring(lastIndex, match.index));
+      }
+      const token = match[0];
+
+      if (token.startsWith('**') && token.endsWith('**')) {
+        parts.push(
+          <strong
+            key={`bold_${match.index}`}
+            className={`font-bold ${isUser ? 'text-white' : 'text-slate-900 font-semibold'}`}
+          >
+            {token.slice(2, -2)}
+          </strong>
+        );
+      } else if (token.startsWith('`') && token.endsWith('`')) {
+        parts.push(
+          <code
+            key={`code_${match.index}`}
+            className={`px-1.5 py-0.5 rounded text-[11px] font-mono ${
+              isUser ? 'bg-emerald-900 text-emerald-100' : 'bg-slate-100 text-slate-800'
+            }`}
+          >
+            {token.slice(1, -1)}
+          </code>
+        );
+      } else if (token.startsWith('[') && token.endsWith(']')) {
+        const actionLabel = token.slice(1, -1).trim();
+        const screenKey = mapLabelToScreen(actionLabel);
+
+        if (screenKey) {
+          parts.push(
+            <button
+              key={`act_${match.index}`}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onActionClick(screenKey);
+              }}
+              className="inline-flex items-center gap-1 my-1 mx-1 px-2.5 py-1 rounded-lg bg-emerald-800 hover:bg-emerald-900 active:scale-95 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+            >
+              <span>{actionLabel}</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          );
+        } else {
+          parts.push(
+            <span
+              key={`pill_${match.index}`}
+              className={`inline-block font-semibold px-1.5 py-0.5 rounded ${
+                isUser ? 'bg-emerald-900 text-emerald-100' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              }`}
+            >
+              {actionLabel}
+            </span>
+          );
+        }
+      }
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < str.length) {
+      parts.push(str.substring(lastIndex));
+    }
+    return parts.length > 0 ? parts : str;
+  };
+
+  const lines = text.split('\n');
+
+  return (
+    <div className="space-y-1.5 leading-relaxed text-xs sm:text-sm">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={idx} className="h-1" />;
+        }
+
+        // Check if line is a header (### or ##)
+        if (trimmed.startsWith('### ') || trimmed.startsWith('## ')) {
+          const headerText = trimmed.replace(/^#+\s*/, '');
+          return (
+            <h5
+              key={idx}
+              className={`font-bold text-xs sm:text-sm pt-1 pb-0.5 ${
+                isUser ? 'text-emerald-100' : 'text-slate-900'
+              }`}
+            >
+              {parseInline(headerText)}
+            </h5>
+          );
+        }
+
+        // Check if bullet point (* or - or •)
+        const bulletMatch = trimmed.match(/^(\*|\-|\u2022)\s+(.*)/);
+        if (bulletMatch) {
+          return (
+            <div key={idx} className="flex items-start gap-2 pl-1 py-0.5">
+              <span
+                className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                  isUser ? 'bg-emerald-200' : 'bg-emerald-700'
+                }`}
+              />
+              <div className="flex-1">{parseInline(bulletMatch[2])}</div>
+            </div>
+          );
+        }
+
+        // Check if numbered item (1. 2. etc.)
+        const numMatch = trimmed.match(/^([0-9]+\.)\s+(.*)/);
+        if (numMatch) {
+          return (
+            <div key={idx} className="flex items-start gap-1.5 pl-1 py-0.5">
+              <span
+                className={`font-bold text-xs shrink-0 ${
+                  isUser ? 'text-emerald-200' : 'text-emerald-800'
+                }`}
+              >
+                {numMatch[1]}
+              </span>
+              <div className="flex-1">{parseInline(numMatch[2])}</div>
+            </div>
+          );
+        }
+
+        return (
+          <p key={idx} className="leading-relaxed">
+            {parseInline(line)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export function AIChatbot({ onNavigate }: AIChatbotProps) {
   const { t, speakText, isSpeaking } = useLanguage();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -93,7 +254,7 @@ export function AIChatbot({ onNavigate }: AIChatbotProps) {
     }
   }, [messages, isOpen, isMinimized]);
 
-  const handleSendMessage = (textToSend?: string) => {
+  const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputText).trim();
     if (!text) return;
 
@@ -108,11 +269,40 @@ export function AIChatbot({ onNavigate }: AIChatbotProps) {
     if (!textToSend) setInputText('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const botResponse = generateAIResponse(text);
-      setMessages((prev) => [...prev, botResponse]);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userQuery: text,
+          messages: [...messages, userMsg],
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reply) {
+          const botMsg: ChatMessage = {
+            id: `bot_${Date.now()}`,
+            sender: 'bot',
+            text: data.reply,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          setMessages((prev) => [...prev, botMsg]);
+          setIsTyping(false);
+          return;
+        }
+      }
+      // If server responded with error or missing key, use local domain response
+      const fallbackResponse = generateAIResponse(text);
+      setMessages((prev) => [...prev, fallbackResponse]);
+    } catch {
+      // Offline / network failure fallback
+      const fallbackResponse = generateAIResponse(text);
+      setMessages((prev) => [...prev, fallbackResponse]);
+    } finally {
       setIsTyping(false);
-    }, 700);
+    }
   };
 
   const generateAIResponse = (query: string): ChatMessage => {
@@ -349,9 +539,11 @@ export function AIChatbot({ onNavigate }: AIChatbotProps) {
                           : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs'
                       }`}
                     >
-                      <p className="whitespace-pre-line leading-relaxed font-medium">
-                        {msg.text}
-                      </p>
+                      <FormattedText
+                        text={msg.text}
+                        isUser={msg.sender === 'user'}
+                        onActionClick={handleActionClick}
+                      />
 
                       {/* Optional Rates Snippet */}
                       {msg.ratesTable && (
